@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriNet MVP</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/styles.css') }}"
+    />
+    <script defer src="{{ url_for('static', path='js/main.js') }}"></script>
+  </head>
+  <body class="bg-gradient">
+    <!-- Header -->
+    <header class="header container flex justify-between">
+      <div class="flex items-center gap-2">
+        <span style="font-weight: bold; font-size: 1.5rem">🌿 AgriNet</span>
+        <!-- <span
+          style="
+            background: #d1fae5;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+          "
+          >MVP</span
+        > -->
+      </div>
+      <div class="flex items-center gap-2">
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Search maize, tomato, goats…"
+        />
+        <select>
+          <option value="">All Categories</option>
+          <option value="grains">Grains</option>
+          <option value="fruits">Fruits</option>
+          <option value="vegetables">Vegetables</option>
+          <option value="livestock">Livestock</option>
+          <option value="dairy">Dairy</option>
+        </select>
+        <button>Buyer Browse</button>
+        <button>Seller Register</button>
+        <button>🛒 <span id="cart-count">0</span></button>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="grid container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <!-- Weather Card -->
+        <div class="card">
+          <h3>Weather Forecast</h3>
+          <select id="city-select">
+            <option value="Lagos">Lagos</option>
+            <option value="Abuja">Abuja</option>
+            <option value="Kano">Kano</option>
+            <option value="Port Harcourt">Port Harcourt</option>
+            <option value="Kaduna">Kaduna</option>
+          </select>
+
+          <!-- Move forecast container OUTSIDE select -->
+          <div id="forecast" class="forecast-container">
+            <!-- JS will populate this -->
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="card">
+          <h3>Quick Links</h3>
+          <button>🚜 Equipment</button>
+          <button>🏭 Cold Rooms</button>
+          <button>💰 Invest</button>
+          <button>🩺 Veterinary</button>
+        </div>
+
+        <!-- Seller Registration -->
+        <div class="card">
+          <h3>Seller Registration</h3>
+          <form id="seller-form">
+            <input name="farmName" placeholder="Farm/Business Name" required />
+            <input name="state" placeholder="State" required />
+            <select name="category">
+              <option>Grains</option>
+              <option>Fruits</option>
+              <option>Vegetables</option>
+              <option>Livestock</option>
+              <option>Dairy</option>
+            </select>
+            <input name="phone" type="tel" placeholder="Phone" required />
+            <button type="submit">Submit</button>
+            <small>KYC & verification required before listing.</small>
+          </form>
+        </div>
+      </aside>
+
+      <!-- Content -->
+      <section class="content">
+        <!-- Tabs -->
+        <div class="tabs">
+          <button class="tab-button active" data-target="market">
+            Marketplace
+          </button>
+          <button class="tab-button" data-target="invest">Invest</button>
+          <button class="tab-button" data-target="equip">Equip & Land</button>
+          <button class="tab-button" data-target="cold">Cold Rooms</button>
+          <button class="tab-button" data-target="livestock">
+            Livestock & Feeds
+          </button>
+          <button class="tab-button" data-target="vet">Veterinary</button>
+        </div>
+
+        <!-- Tab Contents -->
+        <div id="market" class="tab-content active fade-in">
+          <h3>Buy Farm Produce</h3>
+          <div id="market-listings">
+            <div class="card market-item" data-title="Maize">
+              <h4>Maize (100kg bags) <span>✅ Verified</span></h4>
+              <p>Kaduna • per bag</p>
+              <p>₦43,000</p>
+              <button class="add-to-cart-btn" data-item="Maize">Add</button>
+              <button class="cold-room-btn" data-name="Lagos Mainland Cold Hub">
+                Cold Room
+              </button>
+            </div>
+            <div class="card market-item" data-title="Tomatoes">
+              <h4>Tomatoes (25kg crates) ✅ Verified</h4>
+              <p>Kano • per crate</p>
+              <p>₦12,000</p>
+              <button class="add-to-cart-btn" data-item="Tomatoes">Add</button>
+              <button class="cold-room-btn" data-name="Kano Produce Cold Store">
+                Cold Room
+              </button>
+            </div>
+            <div class="card market-item" data-title="Tomatoes">
+              <h4>Tomatoes (25kg crates) ✅ Verified</h4>
+              <p>Kano • per crate</p>
+              <p>₦12,000</p>
+              <button class="add-to-cart-btn" data-item="Tomatoes">Add</button>
+              <button class="cold-room-btn" data-name="Kano Produce Cold Store">
+                Cold Room
+              </button>
+            </div>
+            <div class="card market-item" data-title="Tomatoes">
+              <h4>Tomatoes (25kg crates) ✅ Verified</h4>
+              <p>Kano • per crate</p>
+              <p>₦12,000</p>
+              <button class="add-to-cart-btn" data-item="Tomatoes">Add</button>
+              <button class="cold-room-btn" data-name="Kano Produce Cold Store">
+                Cold Room
+              </button>
+            </div>
+            <!-- Add more listings similarly -->
+          </div>
+        </div>
+
+        <div id="invest" class="tab-content">
+          <h3>Invest in Farmers</h3>
+          <form id="invest-form">
+            <select name="crop">
+              <option>Maize (90 days)</option>
+              <option>Broilers (6 weeks)</option>
+              <option>Catfish (4 months)</option>
+            </select>
+            <input
+              name="amount"
+              type="number"
+              placeholder="Amount (₦)"
+              min="10000"
+              required
+            />
+            <select name="tenor">
+              <option>Short</option>
+              <option>Medium</option>
+              <option>Long</option>
+            </select>
+            <button type="submit">Pledge</button>
+          </form>
+        </div>
+
+        <div id="equip" class="tab-content">
+          <h3>Equipment & Farmland</h3>
+          <div class="grid">
+            <div class="card">
+              <h4>2 Water Pump</h4>
+              <p>Ibadan</p>
+              <p>₦95,000</p>
+              <button>Contact Seller</button>
+            </div>
+            <div class="card">
+              <h4>Tractor (Used, 75HP)</h4>
+              <p>Katsina</p>
+              <p>₦7,800,000</p>
+              <button>Contact Seller</button>
+            </div>
+            <!-- More equipment -->
+          </div>
+        </div>
+
+        <div id="cold" class="tab-content">
+          <h3>Cold Room Access</h3>
+          <div class="grid">
+            <div class="card">
+              <h4>Lagos Mainland Cold Hub</h4>
+              <p>Lagos • 2–4°C</p>
+              <p>Slots Free: 12 • Rate/Day: ₦3,500</p>
+              <button class="cold-room-btn" data-name="Lagos Mainland Cold Hub">
+                Request Slot
+              </button>
+            </div>
+            <div class="card">
+              <h4>Kano Produce Cold Store</h4>
+              <p>Kano • 0–2°C</p>
+              <p>Slots Free: 5 • Rate/Day: ₦3,000</p>
+              <button class="cold-room-btn" data-name="Kano Produce Cold Store">
+                Request Slot
+              </button>
+            </div>
+            <!-- More cold rooms -->
+          </div>
+        </div>
+
+        <div id="livestock" class="tab-content">
+          <h3>Livestock & Feeds</h3>
+          <button id="intl-toggle" data-state="off">Off</button>
+          <div id="local-feeds" class="grid">
+            <div class="card">
+              <h4>Broiler Starter (25kg)</h4>
+              <p>Species: poultry</p>
+              <p>₦10,500</p>
+              <button class="add-to-cart-btn" data-item="Broiler Starter">
+                Add
+              </button>
+            </div>
+            <div class="card">
+              <h4>Catfish Grower (15kg)</h4>
+              <p>Species: fish</p>
+              <p>₦8,700</p>
+              <button class="add-to-cart-btn" data-item="Catfish Grower">
+                Add
+              </button>
+            </div>
+          </div>
+          <div id="foreign-breeds" class="grid" style="display: none">
+            <div class="card">
+              <h4>Sasso Chick (day-old)</h4>
+              <p>Origin: France • Min Order: 200</p>
+              <button>Request Quote</button>
+            </div>
+            <!-- More foreign breeds -->
+          </div>
+        </div>
+
+        <div id="vet" class="tab-content">
+          <h3>Veterinary & Extension</h3>
+          <form id="vet-form">
+            <input name="question" placeholder="Your Question" required />
+            <button type="submit">Ask Vet</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer container">
+      © 2025 AgriNet • Connecting Nigerian farmers, buyers, and investors.
+    </footer>
+  </body>
+</html>
