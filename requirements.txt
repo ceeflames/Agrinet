@@ -33,3 +33,9 @@ flask
 gunicorn
 python-multipart
 python-jose[cryptography]
+fastapi
+uvicorn[standard]
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+jinja2
