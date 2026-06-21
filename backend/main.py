@@ -7,9 +7,14 @@ from typing import List, Optional
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 
 app = FastAPI(title="AgriNet API", version="2.0")
