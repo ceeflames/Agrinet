@@ -31,3 +31,5 @@ watchfiles==1.1.0
 websockets==15.0.1
 flask
 gunicorn
+python-multipart
+python-jose[cryptography]
