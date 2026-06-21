@@ -14,7 +14,6 @@ from fastapi.responses import HTMLResponse
 app = FastAPI(title="AgriNet API", version="2.0")
 # Mount the static folder
 app.mount("/static", StaticFiles(directory="static"), name="static")
-# Add at the top of your main.py
 templates = Jinja2Templates(directory="templates")
 
 
@@ -22,7 +21,6 @@ templates = Jinja2Templates(directory="templates")
 SECRET_KEY = "super-secret-key"  # 🔐 replace with env var in production
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
-
 
 
 # --- AUTH SETUP ---
@@ -104,7 +102,19 @@ feeds = [
 cold_rooms = [
     {"id": 201, "name": "Lagos Cold Hub", "city": "Lagos", "slotsFree": 12, "temp": "2–4°C", "ratePerDay": 3500},
 ]
+equipment = [
+    {"id": 101, "title": "2 Water Pump", "type": "equipment", "price": 95000, "location": "Ibadan"}
+]
+coldRooms = [
+    {"id": 201, "name": "Lagos Mainland Cold Hub", "city": "Lagos", "slotsFree": 12, "temp": "2–4°C", "ratePerDay": 3500}
+]
+categories = [
+    {"key": "grains", "label": "Grains"},
+    {"key": "vegetables", "label": "Vegetables"}
+]
+cities = ["Lagos", "Abuja", "Kano", "Port Harcourt", "Kaduna"]
 cart: List[dict] = []
+
 
 # --- MODELS ---
 class CartItem(BaseModel):
@@ -127,10 +137,27 @@ class VetQuestion(BaseModel):
     question: str
 
 
-# --- ROOT ROUTE ---
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to AgroBridge API v2.0"}
+# --- ROOT ROUTE (serves HTML homepage) ---
+@app.get("/", response_class=HTMLResponse)
+def read_root(request: Request, query: str = "", cat: str = None):
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "listings": listings,
+        "equipment": equipment,
+        "coldRooms": coldRooms,
+        "categories": categories,
+        "cities": cities,
+        "query": query,
+        "cat": cat,
+        "cart_count": 0,
+        "year": 2025,
+        "city": "Lagos",
+        "forecast": [
+            {"day": "Mon", "temp": 31, "desc": "Partly cloudy"},
+            {"day": "Tue", "temp": 29, "desc": "Showers"},
+            {"day": "Wed", "temp": 30, "desc": "Sunny"},
+        ]
+    })
 
 
 # --- PROTECTED ENDPOINTS ---
@@ -154,7 +181,6 @@ def add_to_cart(item: CartItem, user: User = Depends(get_current_user)):
         match = next((f for f in feeds if f["id"] == item.id), None)
     if not match:
         raise HTTPException(404, "Item not found")
-
     cart.append({"item": match, "quantity": item.quantity, "buyer": user.username})
     return {"message": f"Added {match['title']} to cart", "cartSize": len(cart)}
 
@@ -194,42 +220,3 @@ def view_listings(request: Request):
 def view_cart_page(request: Request, user: User = Depends(get_current_user)):
     user_cart = [c for c in cart if c["buyer"] == user.username]
     return templates.TemplateResponse("cart.html", {"request": request, "cart": user_cart, "username": user.username})
-
-
-# Mock data
-listings = [
-    {"id":1,"title":"Maize (100kg bags)","category":"grains","price":43000,"unit":"bag","location":"Kaduna","sellerVerified":True,"coldStorageEligible":True},
-    {"id":2,"title":"Tomatoes (25kg crates)","category":"vegetables","price":12000,"unit":"crate","location":"Kano","sellerVerified":True,"coldStorageEligible":True},
-]
-equipment = [
-    {"id":101,"title":"2 Water Pump","type":"equipment","price":95000,"location":"Ibadan"}
-]
-coldRooms = [
-    {"id":201,"name":"Lagos Mainland Cold Hub","city":"Lagos","slotsFree":12,"temp":"2–4°C","ratePerDay":3500}
-]
-categories = [
-    {"key":"grains","label":"Grains"},
-    {"key":"vegetables","label":"Vegetables"}
-]
-cities = ["Lagos","Abuja","Kano","Port Harcourt","Kaduna"]
-
-@app.get("/index", response_class=HTMLResponse)
-def home(request: Request, query: str = "", cat: str = None):
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "listings": listings,
-        "equipment": equipment,
-        "coldRooms": coldRooms,
-        "categories": categories,
-        "cities": cities,
-        "query": query,
-        "cat": cat,
-        "cart_count": 0,
-        "year": 2025,
-        "city": "Lagos",
-        "forecast": [
-            {"day":"Mon","temp":31,"desc":"Partly cloudy"},
-            {"day":"Tue","temp":29,"desc":"Showers"},
-            {"day":"Wed","temp":30,"desc":"Sunny"},
-        ]
-    })
