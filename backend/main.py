@@ -184,7 +184,7 @@ def ask_vet(q: VetQuestion, user: User = Depends(get_current_user)):
 
 # --- FRONTEND ROUTES ---
 @app.get("/home", response_class=HTMLResponse)
-def home(request: Request):
+def home_page(request: Request):
     return templates.TemplateResponse("home.html", {"request": request, "message": "Welcome to AgroBridge API"})
 
 @app.get("/view-listings", response_class=HTMLResponse)
