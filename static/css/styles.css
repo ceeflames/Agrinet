@@ -1,9 +1,14 @@
+* {
+  box-sizing: border-box;
+}
 /* Reset & basic */
 body, html {
+  overflow-x: hidden;
+  width: 100%;
   margin: 0;
   font-family: 'Arial', sans-serif;
   background: linear-gradient(to bottom, #ffffff, #d1fae5);
-  color: #111827;
+  color: hsl(221, 39%, 11%);
 }
 
 .container {
