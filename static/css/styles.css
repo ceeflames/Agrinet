@@ -191,3 +191,62 @@ form input, form select {
   width: 50px;
   height: 50px;
 }
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
+
+  /* Stack sidebar and content vertically */
+  main.grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Fix header on mobile */
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    top: 0;
+  }
+
+  .header div {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .header input,
+  .header select {
+    width: 100%;
+  }
+
+  /* Fix container padding */
+  .container {
+    padding: 0.5rem;
+  }
+
+  /* Fix market listings grid */
+  #market-listings,
+  #feeds-listings,
+  #cold-listings {
+    grid-template-columns: 1fr;
+  }
+
+  /* Fix tabs */
+  .tabs {
+    margin-top: 1rem;
+  }
+
+  .tab-button {
+    flex: 1 1 45%;
+  }
+
+  /* Fix cards */
+  .sidebar .card,
+  .content .card {
+    padding: 1rem;
+  }
+
+  /* Footer */
+  .footer {
+    margin-bottom: 1rem;
+    padding: 1.5rem;
+  }
+}
