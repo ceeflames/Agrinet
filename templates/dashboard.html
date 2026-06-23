@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriNet — Dashboard</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <style>
+      .dash-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 1rem;
+      }
+      .dash-card {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 1.5rem;
+      }
+      .dash-card h3 {
+        color: #065f46;
+        margin-bottom: 1rem;
+      }
+      .status-badge {
+        display: inline-block;
+        padding: 0.3rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+      .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .status-verified {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .status-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+        font-size: 0.9rem;
+        color: #374151;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        font-size: 0.95rem;
+      }
+      .form-group textarea {
+        height: 80px;
+        resize: vertical;
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      .submit-btn {
+        padding: 0.75rem 1.5rem;
+        background: #10b981;
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .submit-btn:hover {
+        background: #059669;
+      }
+      .submit-btn:disabled {
+        background: #9ca3af;
+      }
+      .logout-btn {
+        padding: 0.5rem 1rem;
+        background: #fee2e2;
+        color: #991b1b;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .produce-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+      .produce-item {
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 1rem;
+      }
+      .produce-item h4 {
+        margin: 0 0 0.5rem;
+        font-size: 0.95rem;
+      }
+      .produce-item p {
+        margin: 0.2rem 0;
+        font-size: 0.85rem;
+        color: #6b7280;
+      }
+      .produce-item .price {
+        color: #065f46;
+        font-weight: 700;
+        font-size: 1rem;
+      }
+      .delete-btn {
+        margin-top: 0.5rem;
+        padding: 0.3rem 0.75rem;
+        background: #fee2e2;
+        color: #991b1b;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-size: 0.8rem;
+      }
+      .success-msg {
+        background: #d1fae5;
+        color: #065f46;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        display: none;
+      }
+      .error-msg {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        display: none;
+      }
+      .welcome-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #farmer-section,
+      #consumer-section,
+      #investor-section,
+      #vet-section {
+        display: none;
+      }
+      @media (max-width: 768px) {
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-gradient">
+    <header class="header container">
+      <a
+        href="/"
+        style="
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 1.25rem;
+          color: #065f46;
+        "
+        >🌿 AgriNet</a
+      >
+      <button class="logout-btn" onclick="logout()">Log Out</button>
+    </header>
+
+    <div class="dash-container">
+      <!-- Profile Card -->
+      <div class="dash-card">
+        <div class="welcome-header">
+          <div>
+            <h3 id="welcome-name">Welcome!</h3>
+            <p style="color: #6b7280; margin: 0" id="welcome-role"></p>
+          </div>
+          <span id="verification-badge" class="status-badge status-pending"
+            >Pending Verification</span
+          >
+        </div>
+      </div>
+
+      <!-- Farmer Section -->
+      <div id="farmer-section">
+        <div class="dash-card">
+          <h3>🌾 List Your Produce</h3>
+          <div id="produce-success" class="success-msg"></div>
+          <div id="produce-error" class="error-msg"></div>
+          <form id="produce-form" enctype="multipart/form-data">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Produce Title</label>
+                <input
+                  type="text"
+                  name="title"
+                  placeholder="e.g. Maize (100kg bags)"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Category</label>
+                <select name="category" required>
+                  <option value="">Select category</option>
+                  <option value="grains">Grains</option>
+                  <option value="vegetables">Vegetables</option>
+                  <option value="fruits">Fruits</option>
+                  <option value="livestock">Livestock</option>
+                  <option value="dairy">Dairy</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Price (₦)</label>
+                <input
+                  type="number"
+                  name="price"
+                  placeholder="e.g. 43000"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Unit</label>
+                <select name="unit" required>
+                  <option value="">Select unit</option>
+                  <option value="bag">Bag</option>
+                  <option value="crate">Crate</option>
+                  <option value="kg">Kg</option>
+                  <option value="litre">Litre</option>
+                  <option value="piece">Piece</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Quantity Available</label>
+                <input
+                  type="number"
+                  name="quantity"
+                  placeholder="e.g. 50"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Location</label>
+                <input
+                  type="text"
+                  name="location"
+                  placeholder="e.g. Kaduna"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Description (optional)</label>
+              <textarea
+                name="description"
+                placeholder="Describe your produce..."
+              ></textarea>
+            </div>
+            <div class="form-group">
+              <label>Produce Photo (optional)</label>
+              <input type="file" name="image" accept="image/*" />
+            </div>
+            <button type="submit" class="submit-btn" id="produce-btn">
+              List Produce
+            </button>
+          </form>
+        </div>
+
+        <!-- My Listings -->
+        <div class="dash-card">
+          <h3>📦 My Listings</h3>
+          <div id="my-produce" class="produce-list">
+            <p style="color: #6b7280">No listings yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Consumer Section -->
+      <div id="consumer-section">
+        <div class="dash-card">
+          <h3>🛒 Browse Marketplace</h3>
+          <p style="color: #6b7280">
+            Your account is under verification. Once approved you can start
+            purchasing produce.
+          </p>
+          <a href="/" style="color: #10b981; font-weight: 600"
+            >Browse Available Produce →</a
+          >
+        </div>
+      </div>
+
+      <!-- Investor Section -->
+      <div id="investor-section">
+        <div class="dash-card">
+          <h3>💰 Investment Dashboard</h3>
+          <p style="color: #6b7280">
+            Your account is under verification. Once approved you can start
+            investing in farmers.
+          </p>
+          <a href="/" style="color: #10b981; font-weight: 600"
+            >View Opportunities →</a
+          >
+        </div>
+      </div>
+
+      <!-- Vet Section -->
+      <div id="vet-section">
+        <div class="dash-card">
+          <h3>🩺 Veterinary Dashboard</h3>
+          <p style="color: #6b7280">
+            Your account is under verification. Once approved you can start
+            answering farmer questions.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      if (!token) window.location.href = "/login";
+
+      async function loadDashboard() {
+        try {
+          const res = await fetch("/auth/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (!res.ok) {
+            localStorage.clear();
+            window.location.href = "/login";
+            return;
+          }
+
+          const user = await res.json();
+
+          // Update profile
+          document.getElementById("welcome-name").textContent =
+            `Welcome, ${user.full_name}! 👋`;
+          document.getElementById("welcome-role").textContent =
+            `Role: ${user.role.charAt(0).toUpperCase() + user.role.slice(1)}`;
+
+          // Verification badge
+          const badge = document.getElementById("verification-badge");
+          if (user.is_verified) {
+            badge.textContent = "✅ Verified";
+            badge.className = "status-badge status-verified";
+          } else {
+            badge.textContent = "⏳ Pending Verification";
+            badge.className = "status-badge status-pending";
+          }
+
+          // Show role section
+          document.getElementById(`${user.role}-section`).style.display =
+            "block";
+
+          // Load farmer produce if farmer
+          if (user.role === "farmer") loadMyProduce();
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      async function loadMyProduce() {
+        try {
+          const res = await fetch("/produce", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const produce = await res.json();
+          const container = document.getElementById("my-produce");
+
+          if (!produce.length) {
+            container.innerHTML =
+              '<p style="color:#6b7280">No listings yet.</p>';
+            return;
+          }
+
+          container.innerHTML = produce
+            .map(
+              (p) => `
+          <div class="produce-item">
+            ${p.image_path ? `<img src="${p.image_path}" style="width:100%;border-radius:0.75rem;margin-bottom:0.5rem;height:120px;object-fit:cover" />` : ""}
+            <h4>${p.title}</h4>
+            <p>${p.location} • per ${p.unit}</p>
+            <p class="price">₦${p.price.toLocaleString()}</p>
+            <p>Qty: ${p.quantity}</p>
+            <button class="delete-btn" onclick="deleteProduce(${p.id})">Remove</button>
+          </div>
+        `,
+            )
+            .join("");
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      document
+        .getElementById("produce-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const btn = document.getElementById("produce-btn");
+          btn.disabled = true;
+          btn.textContent = "Listing...";
+
+          const formData = new FormData(e.target);
+
+          try {
+            const res = await fetch("/produce/add", {
+              method: "POST",
+              headers: { Authorization: `Bearer ${token}` },
+              body: formData,
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+              document.getElementById("produce-success").textContent =
+                "Produce listed successfully!";
+              document.getElementById("produce-success").style.display =
+                "block";
+              document.getElementById("produce-error").style.display = "none";
+              e.target.reset();
+              loadMyProduce();
+            } else {
+              document.getElementById("produce-error").textContent =
+                data.detail || "Failed to list produce";
+              document.getElementById("produce-error").style.display = "block";
+            }
+          } catch (err) {
+            document.getElementById("produce-error").textContent =
+              "Something went wrong";
+            document.getElementById("produce-error").style.display = "block";
+          }
+
+          btn.disabled = false;
+          btn.textContent = "List Produce";
+        });
+
+      async function deleteProduce(id) {
+        if (!confirm("Remove this listing?")) return;
+        await fetch(`/produce/${id}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        loadMyProduce();
+      }
+
+      function logout() {
+        localStorage.clear();
+        window.location.href = "/";
+      }
+
+      loadDashboard();
+    </script>
+  </body>
+</html>

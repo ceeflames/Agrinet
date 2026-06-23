@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriNet — Login</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <style>
+      .auth-container {
+        max-width: 420px;
+        margin: 2rem auto;
+        padding: 1rem;
+      }
+      .auth-card {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+      .auth-card h2 {
+        text-align: center;
+        color: #065f46;
+        margin-bottom: 1.5rem;
+      }
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+        font-size: 0.9rem;
+        color: #374151;
+      }
+      .form-group input {
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        font-size: 0.95rem;
+      }
+      .submit-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background: #10b981;
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .submit-btn:hover {
+        background: #059669;
+      }
+      .submit-btn:disabled {
+        background: #9ca3af;
+      }
+      .signup-link {
+        text-align: center;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: #6b7280;
+      }
+      .signup-link a {
+        color: #10b981;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .error-msg {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        display: none;
+        font-size: 0.9rem;
+      }
+      .success-msg {
+        background: #d1fae5;
+        color: #065f46;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        display: none;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body class="bg-gradient">
+    <header class="header container">
+      <a
+        href="/"
+        style="
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 1.25rem;
+          color: #065f46;
+        "
+        >🌿 AgriNet</a
+      >
+    </header>
+
+    <div class="auth-container">
+      <div class="auth-card">
+        <h2>🌿 Welcome Back</h2>
+
+        <div id="error-msg" class="error-msg"></div>
+        <div id="success-msg" class="success-msg"></div>
+
+        <form id="login-form">
+          <div class="form-group">
+            <label>Email Address</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="you@email.com"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Your password"
+              required
+            />
+          </div>
+          <button type="submit" class="submit-btn" id="login-btn">
+            Log In
+          </button>
+        </form>
+
+        <div class="signup-link">
+          Don't have an account? <a href="/signup">Sign Up</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const btn = document.getElementById("login-btn");
+          btn.disabled = true;
+          btn.textContent = "Logging in...";
+
+          const formData = new FormData(e.target);
+
+          try {
+            const res = await fetch("/auth/login", {
+              method: "POST",
+              body: formData,
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+              localStorage.setItem("token", data.token);
+              localStorage.setItem("role", data.role);
+              localStorage.setItem("name", data.name);
+              showSuccess(`Welcome back, ${data.name}! Redirecting...`);
+              setTimeout(() => {
+                window.location.href = "/dashboard";
+              }, 1500);
+            } else {
+              showError(data.detail || "Login failed");
+              btn.disabled = false;
+              btn.textContent = "Log In";
+            }
+          } catch (err) {
+            showError("Something went wrong");
+            btn.disabled = false;
+            btn.textContent = "Log In";
+          }
+        });
+
+      function showError(msg) {
+        const el = document.getElementById("error-msg");
+        el.textContent = msg;
+        el.style.display = "block";
+        document.getElementById("success-msg").style.display = "none";
+      }
+
+      function showSuccess(msg) {
+        const el = document.getElementById("success-msg");
+        el.textContent = msg;
+        el.style.display = "block";
+        document.getElementById("error-msg").style.display = "none";
+      }
+    </script>
+  </body>
+</html>

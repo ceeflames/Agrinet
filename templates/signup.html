@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriNet — Sign Up</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <style>
+      .auth-container {
+        max-width: 480px;
+        margin: 2rem auto;
+        padding: 1rem;
+      }
+      .auth-card {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+      .auth-card h2 {
+        text-align: center;
+        color: #065f46;
+        margin-bottom: 1.5rem;
+      }
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+        font-size: 0.9rem;
+        color: #374151;
+      }
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        font-size: 0.95rem;
+      }
+      .form-group input[type="file"] {
+        padding: 0.4rem;
+        background: #f9fafb;
+      }
+      .role-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .role-card {
+        border: 2px solid #e5e7eb;
+        border-radius: 1rem;
+        padding: 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .role-card:hover {
+        border-color: #10b981;
+        background: #f0fdf4;
+      }
+      .role-card.selected {
+        border-color: #10b981;
+        background: #ecfdf5;
+      }
+      .role-card .emoji {
+        font-size: 1.8rem;
+      }
+      .role-card .label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-top: 0.3rem;
+      }
+      .docs-section {
+        background: #f0fdf4;
+        border-radius: 1rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: none;
+      }
+      .docs-section h4 {
+        color: #065f46;
+        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+      }
+      .submit-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background: #10b981;
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .submit-btn:hover {
+        background: #059669;
+      }
+      .submit-btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+      }
+      .login-link {
+        text-align: center;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: #6b7280;
+      }
+      .login-link a {
+        color: #10b981;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .error-msg {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        display: none;
+        font-size: 0.9rem;
+      }
+      .success-msg {
+        background: #d1fae5;
+        color: #065f46;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        display: none;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body class="bg-gradient">
+    <header class="header container">
+      <a
+        href="/"
+        style="
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 1.25rem;
+          color: #065f46;
+        "
+        >🌿 AgriNet</a
+      >
+    </header>
+
+    <div class="auth-container">
+      <div class="auth-card">
+        <h2>Create Account</h2>
+
+        <div id="error-msg" class="error-msg"></div>
+        <div id="success-msg" class="success-msg"></div>
+
+        <form id="signup-form" enctype="multipart/form-data">
+          <!-- Role Selection -->
+          <div class="form-group">
+            <label>I am a...</label>
+            <div class="role-grid">
+              <div class="role-card" onclick="selectRole('farmer')">
+                <div class="emoji">🌾</div>
+                <div class="label">Farmer</div>
+              </div>
+              <div class="role-card" onclick="selectRole('consumer')">
+                <div class="emoji">🛒</div>
+                <div class="label">Consumer / Buyer</div>
+              </div>
+              <div class="role-card" onclick="selectRole('investor')">
+                <div class="emoji">💰</div>
+                <div class="label">Investor</div>
+              </div>
+              <div class="role-card" onclick="selectRole('vet')">
+                <div class="emoji">🩺</div>
+                <div class="label">Veterinarian</div>
+              </div>
+            </div>
+            <input type="hidden" name="role" id="role-input" required />
+          </div>
+
+          <!-- Basic Info -->
+          <div class="form-group">
+            <label>Full Name</label>
+            <input
+              type="text"
+              name="full_name"
+              placeholder="John Doe"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="you@email.com"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input
+              type="tel"
+              name="phone"
+              placeholder="+2348012345678"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Min 8 characters"
+              required
+              minlength="8"
+            />
+          </div>
+
+          <!-- Farmer Docs -->
+          <div id="farmer-docs" class="docs-section">
+            <h4>📋 Farmer Verification Documents</h4>
+            <div class="form-group">
+              <label>NIN / National ID *</label>
+              <input type="file" name="nin" accept="image/*,.pdf" />
+            </div>
+            <div class="form-group">
+              <label>CAC Business Registration (optional)</label>
+              <input type="file" name="cac" accept="image/*,.pdf" />
+            </div>
+            <div class="form-group">
+              <label>Farm Photo *</label>
+              <input type="file" name="farm_photo" accept="image/*" />
+            </div>
+            <div class="form-group">
+              <label>Bank Details / Statement *</label>
+              <input type="file" name="bank_details" accept="image/*,.pdf" />
+            </div>
+          </div>
+
+          <!-- Consumer Docs -->
+          <div id="consumer-docs" class="docs-section">
+            <h4>📋 Buyer Verification</h4>
+            <div class="form-group">
+              <label>NIN / National ID *</label>
+              <input type="file" name="nin" accept="image/*,.pdf" />
+            </div>
+          </div>
+
+          <!-- Investor Docs -->
+          <div id="investor-docs" class="docs-section">
+            <h4>📋 Investor Verification Documents</h4>
+            <div class="form-group">
+              <label>NIN / National ID *</label>
+              <input type="file" name="nin" accept="image/*,.pdf" />
+            </div>
+            <div class="form-group">
+              <label>Bank Details / Statement *</label>
+              <input type="file" name="bank_details" accept="image/*,.pdf" />
+            </div>
+          </div>
+
+          <!-- Vet Docs -->
+          <div id="vet-docs" class="docs-section">
+            <h4>📋 Veterinarian Verification Documents</h4>
+            <div class="form-group">
+              <label>NIN / National ID *</label>
+              <input type="file" name="nin" accept="image/*,.pdf" />
+            </div>
+            <div class="form-group">
+              <label>Veterinary License *</label>
+              <input type="file" name="vet_license" accept="image/*,.pdf" />
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submit-btn">
+            Create Account
+          </button>
+        </form>
+
+        <div class="login-link">
+          Already have an account? <a href="/login">Log In</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let selectedRole = null;
+
+      function selectRole(role) {
+        selectedRole = role;
+        document.getElementById("role-input").value = role;
+
+        // Update UI
+        document
+          .querySelectorAll(".role-card")
+          .forEach((c) => c.classList.remove("selected"));
+        event.currentTarget.classList.add("selected");
+
+        // Hide all doc sections
+        ["farmer-docs", "consumer-docs", "investor-docs", "vet-docs"].forEach(
+          (id) => {
+            document.getElementById(id).style.display = "none";
+          },
+        );
+
+        // Show relevant docs
+        const map = {
+          farmer: "farmer-docs",
+          consumer: "consumer-docs",
+          investor: "investor-docs",
+          vet: "vet-docs",
+        };
+        document.getElementById(map[role]).style.display = "block";
+      }
+
+      document
+        .getElementById("signup-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          if (!selectedRole) {
+            showError("Please select your role");
+            return;
+          }
+
+          const btn = document.getElementById("submit-btn");
+          btn.disabled = true;
+          btn.textContent = "Creating account...";
+
+          const formData = new FormData(e.target);
+
+          try {
+            const res = await fetch("/auth/register", {
+              method: "POST",
+              body: formData,
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+              showSuccess(
+                "Account created! Redirecting to OTP verification...",
+              );
+              setTimeout(() => {
+                window.location.href = `/verify-otp?user_id=${data.user_id}`;
+              }, 1500);
+            } else {
+              showError(data.detail || "Registration failed");
+              btn.disabled = false;
+              btn.textContent = "Create Account";
+            }
+          } catch (err) {
+            showError("Something went wrong. Please try again.");
+            btn.disabled = false;
+            btn.textContent = "Create Account";
+          }
+        });
+
+      function showError(msg) {
+        const el = document.getElementById("error-msg");
+        el.textContent = msg;
+        el.style.display = "block";
+        document.getElementById("success-msg").style.display = "none";
+      }
+
+      function showSuccess(msg) {
+        const el = document.getElementById("success-msg");
+        el.textContent = msg;
+        el.style.display = "block";
+        document.getElementById("error-msg").style.display = "none";
+      }
+    </script>
+  </body>
+</html>

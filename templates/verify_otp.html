@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriNet — Verify OTP</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <style>
+      .auth-container {
+        max-width: 420px;
+        margin: 2rem auto;
+        padding: 1rem;
+      }
+      .auth-card {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      .auth-card h2 {
+        color: #065f46;
+        margin-bottom: 0.5rem;
+      }
+      .auth-card p {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+      }
+      .otp-inputs {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+      }
+      .otp-inputs input {
+        width: 48px;
+        height: 56px;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        border: 2px solid #d1d5db;
+        border-radius: 0.75rem;
+        outline: none;
+        transition: border 0.2s;
+      }
+      .otp-inputs input:focus {
+        border-color: #10b981;
+      }
+      .submit-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background: #10b981;
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .submit-btn:hover {
+        background: #059669;
+      }
+      .submit-btn:disabled {
+        background: #9ca3af;
+      }
+      .resend-btn {
+        background: none;
+        border: none;
+        color: #10b981;
+        cursor: pointer;
+        font-size: 0.9rem;
+        margin-top: 1rem;
+        font-weight: 600;
+      }
+      .error-msg {
+        background: #fee2e2;
+        color: #991b1b;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        display: none;
+        font-size: 0.9rem;
+      }
+      .success-msg {
+        background: #d1fae5;
+        color: #065f46;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        display: none;
+        font-size: 0.9rem;
+      }
+      .phone-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body class="bg-gradient">
+    <header class="header container">
+      <a
+        href="/"
+        style="
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 1.25rem;
+          color: #065f46;
+        "
+        >🌿 AgriNet</a
+      >
+    </header>
+
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="phone-icon">📱</div>
+        <h2>Verify Your Phone</h2>
+        <p>
+          We sent a 6-digit OTP to your phone number. Enter it below to verify
+          your account.
+        </p>
+
+        <div id="error-msg" class="error-msg"></div>
+        <div id="success-msg" class="success-msg"></div>
+
+        <div class="otp-inputs">
+          <input type="text" maxlength="1" class="otp-digit" />
+          <input type="text" maxlength="1" class="otp-digit" />
+          <input type="text" maxlength="1" class="otp-digit" />
+          <input type="text" maxlength="1" class="otp-digit" />
+          <input type="text" maxlength="1" class="otp-digit" />
+          <input type="text" maxlength="1" class="otp-digit" />
+        </div>
+
+        <button class="submit-btn" id="verify-btn" onclick="verifyOtp()">
+          Verify OTP
+        </button>
+        <br />
+        <button class="resend-btn" onclick="resendOtp()">Resend OTP</button>
+      </div>
+    </div>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const userId = params.get("user_id");
+
+      // Auto-focus next input
+      document
+        .querySelectorAll(".otp-digit")
+        .forEach((input, index, inputs) => {
+          input.addEventListener("input", () => {
+            if (input.value && index < inputs.length - 1) {
+              inputs[index + 1].focus();
+            }
+          });
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Backspace" && !input.value && index > 0) {
+              inputs[index - 1].focus();
+            }
+          });
+        });
+
+      async function verifyOtp() {
+        const digits = [...document.querySelectorAll(".otp-digit")]
+          .map((i) => i.value)
+          .join("");
+        if (digits.length !== 6) {
+          showError("Please enter all 6 digits");
+          return;
+        }
+
+        const btn = document.getElementById("verify-btn");
+        btn.disabled = true;
+        btn.textContent = "Verifying...";
+
+        const formData = new FormData();
+        formData.append("user_id", userId);
+        formData.append("otp", digits);
+
+        try {
+          const res = await fetch("/auth/verify-otp", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await res.json();
+
+          if (res.ok) {
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("role", data.role);
+            showSuccess("Phone verified! Redirecting...");
+            setTimeout(() => {
+              window.location.href = "/dashboard";
+            }, 1500);
+          } else {
+            showError(data.detail || "Invalid OTP");
+            btn.disabled = false;
+            btn.textContent = "Verify OTP";
+          }
+        } catch (err) {
+          showError("Something went wrong");
+          btn.disabled = false;
+          btn.textContent = "Verify OTP";
+        }
+      }
+
+      async function resendOtp() {
+        const formData = new FormData();
+        formData.append("user_id", userId);
+        const res = await fetch("/auth/resend-otp", {
+          method: "POST",
+          body: formData,
+        });
+        if (res.ok) showSuccess("OTP resent to your phone");
+        else showError("Failed to resend OTP");
+      }
+
+      function showError(msg) {
+        const el = document.getElementById("error-msg");
+        el.textContent = msg;
+        el.style.display = "block";
+        document.getElementById("success-msg").style.display = "none";
+      }
+
+      function showSuccess(msg) {
+        const el = document.getElementById("success-msg");
+        el.textContent = msg;
+        el.style.display = "block";
+        document.getElementById("error-msg").style.display = "none";
+      }
+    </script>
+  </body>
+</html>

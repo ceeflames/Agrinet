@@ -6,34 +6,45 @@
     <title>AgriNet MVP</title>
     <link rel="stylesheet" href="/static/css/styles.css" />
     <script defer src="/static/js/main.js"></script>
-    <!-- <link
-      rel="stylesheet"
-      href="{{ url_for('static', path='css/styles.css') }}"
-    />
-    <script defer src="{{ url_for('static', path='js/main.js') }}"></script> -->
+    <style>
+      .auth-buttons { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+      .btn-login {
+        padding: 0.4rem 0.9rem; border-radius: 0.5rem; border: 2px solid #10b981;
+        background: white; color: #10b981; font-weight: 600; cursor: pointer; font-size: 0.85rem;
+      }
+      .btn-signup {
+        padding: 0.4rem 0.9rem; border-radius: 0.5rem; border: none;
+        background: #10b981; color: white; font-weight: 600; cursor: pointer; font-size: 0.85rem;
+      }
+      .btn-logout {
+        padding: 0.4rem 0.9rem; border-radius: 0.5rem; border: none;
+        background: #fee2e2; color: #991b1b; font-weight: 600; cursor: pointer; font-size: 0.85rem;
+      }
+      .btn-dashboard {
+        padding: 0.4rem 0.9rem; border-radius: 0.5rem; border: none;
+        background: #065f46; color: white; font-weight: 600; cursor: pointer; font-size: 0.85rem;
+      }
+      .user-greeting {
+        font-weight: 600; color: #065f46; font-size: 0.9rem;
+      }
+      .seller-reg-notice {
+        background: #f0fdf4; border: 1px solid #10b981;
+        border-radius: 0.75rem; padding: 0.75rem;
+        font-size: 0.85rem; color: #065f46; text-align: center;
+      }
+      .seller-reg-notice a { color: #10b981; font-weight: 600; text-decoration: none; }
+    </style>
   </head>
   <body class="bg-gradient">
+
     <!-- Header -->
     <header class="header container flex justify-between">
       <div class="flex items-center gap-2">
-        <span style="font-weight: bold; font-size: 1.5rem">🌿 AgriNet</span>
-        <!-- <span
-          style="
-            background: #d1fae5;
-            padding: 0.2rem 0.5rem;
-            border-radius: 0.5rem;
-            font-size: 0.8rem;
-          "
-          >MVP</span
-        > -->
+        <a href="/" style="text-decoration:none; font-weight:bold; font-size:1.5rem; color:#065f46">🌿 AgriNet</a>
       </div>
       <div class="flex items-center gap-2">
-        <input
-          type="text"
-          id="search-input"
-          placeholder="Search maize, tomato, goats…"
-        />
-        <select>
+        <input type="text" id="search-input" placeholder="Search maize, tomato, goats…" />
+        <select id="category-filter">
           <option value="">All Categories</option>
           <option value="grains">Grains</option>
           <option value="fruits">Fruits</option>
@@ -41,16 +52,22 @@
           <option value="livestock">Livestock</option>
           <option value="dairy">Dairy</option>
         </select>
-        <button>Buyer Browse</button>
-        <button>Seller Register</button>
-        <button>🛒 <span id="cart-count">0</span></button>
+
+        <!-- Auth Buttons — updated by JS -->
+        <div class="auth-buttons" id="auth-buttons">
+          <button class="btn-login" onclick="window.location.href='/login'">Log In</button>
+          <button class="btn-signup" onclick="window.location.href='/signup'">Sign Up</button>
+          <button>🛒 <span id="cart-count">0</span></button>
+        </div>
       </div>
     </header>
 
     <!-- Main Grid -->
     <main class="grid container">
+
       <!-- Sidebar -->
       <aside class="sidebar">
+
         <!-- Weather Card -->
         <div class="card">
           <h3>Weather Forecast</h3>
@@ -61,8 +78,6 @@
             <option value="Port Harcourt">Port Harcourt</option>
             <option value="Kaduna">Kaduna</option>
           </select>
-
-          <!-- Move forecast container OUTSIDE select -->
           <div id="forecast" class="forecast-container">
             <!-- JS will populate this -->
           </div>
@@ -71,116 +86,80 @@
         <!-- Quick Links -->
         <div class="card">
           <h3>Quick Links</h3>
-          <button>🚜 Equipment</button>
-          <button>🏭 Cold Rooms</button>
-          <button>💰 Invest</button>
-          <button>🩺 Veterinary</button>
+          <button onclick="switchTab('equip')">🚜 Equipment</button>
+          <button onclick="switchTab('cold')">🏭 Cold Rooms</button>
+          <button onclick="switchTab('invest')">💰 Invest</button>
+          <button onclick="switchTab('vet')">🩺 Veterinary</button>
         </div>
 
-        <!-- Seller Registration -->
-        <div class="card">
-          <h3>Seller Registration</h3>
-          <form id="seller-form">
-            <input name="farmName" placeholder="Farm/Business Name" required />
-            <input name="state" placeholder="State" required />
-            <select name="category">
-              <option>Grains</option>
-              <option>Fruits</option>
-              <option>Vegetables</option>
-              <option>Livestock</option>
-              <option>Dairy</option>
-            </select>
-            <input name="phone" type="tel" placeholder="Phone" required />
-            <button type="submit">Submit</button>
-            <small>KYC & verification required before listing.</small>
-          </form>
+        <!-- Seller Registration Card -->
+        <div class="card" id="seller-reg-card">
+          <h3>Sell on AgriNet</h3>
+          <div id="seller-reg-content">
+            <!-- Updated by JS based on auth state -->
+          </div>
         </div>
+
       </aside>
 
       <!-- Content -->
       <section class="content">
+
         <!-- Tabs -->
         <div class="tabs">
-          <button class="tab-button active" data-target="market">
-            Marketplace
-          </button>
+          <button class="tab-button active" data-target="market">Marketplace</button>
           <button class="tab-button" data-target="invest">Invest</button>
           <button class="tab-button" data-target="equip">Equip & Land</button>
           <button class="tab-button" data-target="cold">Cold Rooms</button>
-          <button class="tab-button" data-target="livestock">
-            Livestock & Feeds
-          </button>
+          <button class="tab-button" data-target="livestock">Livestock & Feeds</button>
           <button class="tab-button" data-target="vet">Veterinary</button>
         </div>
 
-        <!-- Tab Contents -->
+        <!-- Marketplace Tab -->
         <div id="market" class="tab-content active fade-in">
           <h3>Buy Farm Produce</h3>
           <div id="market-listings">
+            <!-- Static fallback listings -->
             <div class="card market-item" data-title="Maize">
               <h4>Maize (100kg bags) <span>✅ Verified</span></h4>
               <p>Kaduna • per bag</p>
               <p>₦43,000</p>
-              <button class="add-to-cart-btn" data-item="Maize">Add</button>
-              <button class="cold-room-btn" data-name="Lagos Mainland Cold Hub">
-                Cold Room
-              </button>
+              <button class="add-to-cart-btn" data-item="Maize">Add to Cart</button>
+              <button class="cold-room-btn" data-name="Lagos Mainland Cold Hub">Cold Room</button>
             </div>
             <div class="card market-item" data-title="Tomatoes">
               <h4>Tomatoes (25kg crates) ✅ Verified</h4>
               <p>Kano • per crate</p>
               <p>₦12,000</p>
-              <button class="add-to-cart-btn" data-item="Tomatoes">Add</button>
-              <button class="cold-room-btn" data-name="Kano Produce Cold Store">
-                Cold Room
-              </button>
+              <button class="add-to-cart-btn" data-item="Tomatoes">Add to Cart</button>
+              <button class="cold-room-btn" data-name="Kano Produce Cold Store">Cold Room</button>
             </div>
-            <div class="card market-item" data-title="Tomatoes">
-              <h4>Tomatoes (25kg crates) ✅ Verified</h4>
-              <p>Kano • per crate</p>
-              <p>₦12,000</p>
-              <button class="add-to-cart-btn" data-item="Tomatoes">Add</button>
-              <button class="cold-room-btn" data-name="Kano Produce Cold Store">
-                Cold Room
-              </button>
-            </div>
-            <div class="card market-item" data-title="Tomatoes">
-              <h4>Tomatoes (25kg crates) ✅ Verified</h4>
-              <p>Kano • per crate</p>
-              <p>₦12,000</p>
-              <button class="add-to-cart-btn" data-item="Tomatoes">Add</button>
-              <button class="cold-room-btn" data-name="Kano Produce Cold Store">
-                Cold Room
-              </button>
-            </div>
-            <!-- Add more listings similarly -->
           </div>
         </div>
 
+        <!-- Invest Tab -->
         <div id="invest" class="tab-content">
           <h3>Invest in Farmers</h3>
+          <div id="invest-auth-notice" style="display:none" class="seller-reg-notice">
+            <p>Please <a href="/login">log in</a> or <a href="/signup">sign up</a> to invest in farmers.</p>
+          </div>
           <form id="invest-form">
             <select name="crop">
               <option>Maize (90 days)</option>
               <option>Broilers (6 weeks)</option>
               <option>Catfish (4 months)</option>
             </select>
-            <input
-              name="amount"
-              type="number"
-              placeholder="Amount (₦)"
-              min="10000"
-              required
-            />
+            <input name="amount" type="number" placeholder="Amount (₦)" min="10000" required />
             <select name="tenor">
               <option>Short</option>
               <option>Medium</option>
               <option>Long</option>
             </select>
-            <button type="submit">Pledge</button>
+            <button type="submit">Pledge Investment</button>
           </form>
         </div>
 
+        <!-- Equipment Tab -->
         <div id="equip" class="tab-content">
           <h3>Equipment & Farmland</h3>
           <div class="grid">
@@ -196,10 +175,10 @@
               <p>₦7,800,000</p>
               <button>Contact Seller</button>
             </div>
-            <!-- More equipment -->
           </div>
         </div>
 
+        <!-- Cold Rooms Tab -->
         <div id="cold" class="tab-content">
           <h3>Cold Room Access</h3>
           <div class="grid">
@@ -207,66 +186,208 @@
               <h4>Lagos Mainland Cold Hub</h4>
               <p>Lagos • 2–4°C</p>
               <p>Slots Free: 12 • Rate/Day: ₦3,500</p>
-              <button class="cold-room-btn" data-name="Lagos Mainland Cold Hub">
-                Request Slot
-              </button>
+              <button class="cold-room-btn" data-name="Lagos Mainland Cold Hub">Request Slot</button>
             </div>
             <div class="card">
               <h4>Kano Produce Cold Store</h4>
               <p>Kano • 0–2°C</p>
               <p>Slots Free: 5 • Rate/Day: ₦3,000</p>
-              <button class="cold-room-btn" data-name="Kano Produce Cold Store">
-                Request Slot
-              </button>
+              <button class="cold-room-btn" data-name="Kano Produce Cold Store">Request Slot</button>
             </div>
-            <!-- More cold rooms -->
           </div>
         </div>
 
+        <!-- Livestock Tab -->
         <div id="livestock" class="tab-content">
           <h3>Livestock & Feeds</h3>
-          <button id="intl-toggle" data-state="off">Off</button>
+          <button id="intl-toggle" data-state="off">Show International Breeds</button>
           <div id="local-feeds" class="grid">
             <div class="card">
               <h4>Broiler Starter (25kg)</h4>
               <p>Species: poultry</p>
               <p>₦10,500</p>
-              <button class="add-to-cart-btn" data-item="Broiler Starter">
-                Add
-              </button>
+              <button class="add-to-cart-btn" data-item="Broiler Starter">Add</button>
             </div>
             <div class="card">
               <h4>Catfish Grower (15kg)</h4>
               <p>Species: fish</p>
               <p>₦8,700</p>
-              <button class="add-to-cart-btn" data-item="Catfish Grower">
-                Add
-              </button>
+              <button class="add-to-cart-btn" data-item="Catfish Grower">Add</button>
             </div>
           </div>
-          <div id="foreign-breeds" class="grid" style="display: none">
+          <div id="foreign-breeds" class="grid" style="display:none">
             <div class="card">
               <h4>Sasso Chick (day-old)</h4>
               <p>Origin: France • Min Order: 200</p>
               <button>Request Quote</button>
             </div>
-            <!-- More foreign breeds -->
           </div>
         </div>
 
+        <!-- Vet Tab -->
         <div id="vet" class="tab-content">
           <h3>Veterinary & Extension</h3>
+          <div id="vet-auth-notice" style="display:none" class="seller-reg-notice">
+            <p>Please <a href="/login">log in</a> or <a href="/signup">sign up</a> to ask a vet.</p>
+          </div>
           <form id="vet-form">
-            <input name="question" placeholder="Your Question" required />
+            <input name="question" placeholder="Ask your farming or animal health question…" required />
             <button type="submit">Ask Vet</button>
           </form>
         </div>
+
       </section>
     </main>
 
     <!-- Footer -->
     <footer class="footer container">
-      © 2025 AgriNet • Connecting Nigerian farmers, buyers, and investors.
+      © 2025 AgriNet • My Farm And I.
     </footer>
+
+    <script>
+      // --- AUTH STATE ---
+      const token = localStorage.getItem('token');
+      const role = localStorage.getItem('role');
+      const name = localStorage.getItem('name');
+
+      function updateAuthUI() {
+        const authButtons = document.getElementById('auth-buttons');
+        const sellerCard = document.getElementById('seller-reg-content');
+
+        if (token && name) {
+          // Logged in
+          authButtons.innerHTML = `
+            <span class="user-greeting">👤 ${name}</span>
+            <button class="btn-dashboard" onclick="window.location.href='/dashboard'">Dashboard</button>
+            <button class="btn-logout" onclick="logout()">Log Out</button>
+            <button>🛒 <span id="cart-count">0</span></button>
+          `;
+
+          // Seller card — show based on role
+          if (role === 'farmer') {
+            sellerCard.innerHTML = `
+              <div class="seller-reg-notice">
+                <p>✅ You're registered as a farmer.</p>
+                <a href="/dashboard">Go to Dashboard to list produce →</a>
+              </div>
+            `;
+          } else {
+            sellerCard.innerHTML = `
+              <div class="seller-reg-notice">
+                <p>Want to sell on AgriNet?</p>
+                <a href="/signup">Register as a Farmer →</a>
+              </div>
+            `;
+          }
+
+          // Show invest and vet forms only if logged in
+          document.getElementById('invest-auth-notice').style.display = 'none';
+          document.getElementById('invest-form').style.display = 'block';
+          document.getElementById('vet-auth-notice').style.display = 'none';
+          document.getElementById('vet-form').style.display = 'block';
+
+        } else {
+          // Not logged in
+          authButtons.innerHTML = `
+            <button class="btn-login" onclick="window.location.href='/login'">Log In</button>
+            <button class="btn-signup" onclick="window.location.href='/signup'">Sign Up</button>
+            <button>🛒 <span id="cart-count">0</span></button>
+          `;
+
+          sellerCard.innerHTML = `
+            <div class="seller-reg-notice">
+              <p>Want to sell on AgriNet?</p>
+              <a href="/signup">Create a Farmer Account →</a>
+            </div>
+            <small style="color:#6b7280; display:block; margin-top:0.5rem">KYC & verification required before listing.</small>
+          `;
+
+          // Hide invest and vet forms if not logged in
+          document.getElementById('invest-auth-notice').style.display = 'block';
+          document.getElementById('invest-form').style.display = 'none';
+          document.getElementById('vet-auth-notice').style.display = 'block';
+          document.getElementById('vet-form').style.display = 'none';
+        }
+      }
+
+      function logout() {
+        localStorage.clear();
+        window.location.href = '/';
+      }
+
+      // --- TABS ---
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById(btn.dataset.target).classList.add('active');
+        });
+      });
+
+      function switchTab(target) {
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelector(`[data-target="${target}"]`).classList.add('active');
+        document.getElementById(target).classList.add('active');
+      }
+
+      // --- INTERNATIONAL TOGGLE ---
+      document.getElementById('intl-toggle').addEventListener('click', function () {
+        const state = this.dataset.state;
+        if (state === 'off') {
+          document.getElementById('foreign-breeds').style.display = 'grid';
+          this.textContent = 'Hide International Breeds';
+          this.dataset.state = 'on';
+        } else {
+          document.getElementById('foreign-breeds').style.display = 'none';
+          this.textContent = 'Show International Breeds';
+          this.dataset.state = 'off';
+        }
+      });
+
+      // --- LOAD PRODUCE FROM DB ---
+      async function loadProduce() {
+        try {
+          const res = await fetch('/produce');
+          const produce = await res.json();
+          if (produce && produce.length > 0) {
+            const container = document.getElementById('market-listings');
+            container.innerHTML = produce.map(p => `
+              <div class="card market-item" data-title="${p.title}">
+                ${p.image_path ? `<img src="${p.image_path}" style="width:100%;border-radius:0.75rem;margin-bottom:0.5rem;height:140px;object-fit:cover" />` : ''}
+                <h4>${p.title} <span>✅ Verified</span></h4>
+                <p>${p.location} • per ${p.unit}</p>
+                <p style="font-weight:700;color:#065f46">₦${p.price.toLocaleString()}</p>
+                <button class="add-to-cart-btn" data-item="${p.title}">Add to Cart</button>
+              </div>
+            `).join('');
+          }
+        } catch (err) {
+          console.log('Using static listings');
+        }
+      }
+
+      // --- INVEST FORM ---
+      document.getElementById('invest-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!token) { window.location.href = '/login'; return; }
+        alert('Investment pledge submitted! Our team will contact you shortly.');
+      });
+
+      // --- VET FORM ---
+      document.getElementById('vet-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!token) { window.location.href = '/login'; return; }
+        const question = e.target.question.value;
+        alert(`Your question has been submitted: "${question}". A vet will respond shortly.`);
+        e.target.reset();
+      });
+
+      // --- INIT ---
+      updateAuthUI();
+      loadProduce();
+    </script>
+
   </body>
 </html>
