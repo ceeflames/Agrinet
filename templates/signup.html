@@ -178,6 +178,10 @@
                 <div class="emoji">🩺</div>
                 <div class="label">Veterinarian</div>
               </div>
+              <div class="role-card" onclick="selectRole('vendor')">
+                <div class="emoji">🏭</div>
+                <div class="label">Vendor / Service Provider</div>
+              </div>
             </div>
             <input type="hidden" name="role" id="role-input" required />
           </div>
@@ -277,6 +281,49 @@
             </div>
           </div>
 
+          <!-- Vendor Docs -->
+          <div id="vendor-docs" class="docs-section">
+            <h4>📋 Vendor / Service Provider Documents</h4>
+            <p
+              style="font-size: 0.85rem; color: #6b7280; margin-bottom: 0.75rem"
+            >
+              Vendors can list cold rooms, equipment, and farmland on AgriNet.
+            </p>
+            <div class="form-group">
+              <label>Business Name</label>
+              <input
+                type="text"
+                name="business_name"
+                placeholder="e.g. Eko Cold Storage Ltd"
+              />
+            </div>
+            <div class="form-group">
+              <label>Services Offered</label>
+              <select name="vendor_type">
+                <option value="cold_room">Cold Room / Storage</option>
+                <option value="equipment">Equipment / Machinery</option>
+                <option value="farmland">Farmland Rental</option>
+                <option value="all">All Services</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>NIN / National ID *</label>
+              <input type="file" name="nin" accept="image/*,.pdf" />
+            </div>
+            <div class="form-group">
+              <label>CAC Business Registration *</label>
+              <input type="file" name="cac" accept="image/*,.pdf" />
+            </div>
+            <div class="form-group">
+              <label>Bank Details / Statement *</label>
+              <input type="file" name="bank_details" accept="image/*,.pdf" />
+            </div>
+            <div class="form-group">
+              <label>Facility / Asset Photos</label>
+              <input type="file" name="farm_photo" accept="image/*" />
+            </div>
+          </div>
+
           <button type="submit" class="submit-btn" id="submit-btn">
             Create Account
           </button>
@@ -302,11 +349,15 @@
         event.currentTarget.classList.add("selected");
 
         // Hide all doc sections
-        ["farmer-docs", "consumer-docs", "investor-docs", "vet-docs"].forEach(
-          (id) => {
-            document.getElementById(id).style.display = "none";
-          },
-        );
+        [
+          "farmer-docs",
+          "consumer-docs",
+          "investor-docs",
+          "vet-docs",
+          "vendor-docs",
+        ].forEach((id) => {
+          document.getElementById(id).style.display = "none";
+        });
 
         // Show relevant docs
         const map = {
@@ -314,6 +365,7 @@
           consumer: "consumer-docs",
           investor: "investor-docs",
           vet: "vet-docs",
+          vendor: "vendor-docs",
         };
         document.getElementById(map[role]).style.display = "block";
       }

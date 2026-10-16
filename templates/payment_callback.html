@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriNet — Payment</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+  </head>
+  <body class="bg-gradient">
+    <header class="header container">
+      <a
+        href="/"
+        style="
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 1.25rem;
+          color: #065f46;
+        "
+        >🌿 AgriNet</a
+      >
+    </header>
+
+    <div style="max-width: 480px; margin: 3rem auto; padding: 1rem">
+      <div class="dash-card" style="text-align: center; padding: 3rem 2rem">
+        <div id="loading" style="font-size: 3rem">⏳</div>
+        <h2 id="status-title" style="color: #065f46; margin: 1rem 0">
+          Verifying Payment...
+        </h2>
+        <p id="status-msg" style="color: #6b7280"></p>
+        <div id="action-btn" style="margin-top: 1.5rem"></div>
+      </div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      const reference =
+        new URLSearchParams(window.location.search).get("reference") ||
+        "{{ reference }}";
+
+      const routes = {
+        farmer: "/farmer-dashboard",
+        consumer: "/consumer-dashboard",
+        investor: "/investor-dashboard",
+        vet: "/vet-dashboard",
+      };
+
+      async function verifyPayment() {
+        if (!reference || reference === "None") {
+          showError("No payment reference found.");
+          return;
+        }
+        try {
+          const res = await fetch(`/payments/verify/${reference}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = await res.json();
+          if (res.ok) {
+            showSuccess(data.message || "Payment successful!");
+          } else {
+            showError(data.detail || "Payment verification failed.");
+          }
+        } catch (err) {
+          showError("Something went wrong. Please contact support.");
+        }
+      }
+
+      function showSuccess(msg) {
+        document.getElementById("loading").textContent = "✅";
+        document.getElementById("status-title").textContent =
+          "Payment Successful!";
+        document.getElementById("status-msg").textContent = msg;
+        document.getElementById("action-btn").innerHTML = `
+        <button onclick="window.location.href='${routes[role] || "/"}'" class="submit-btn" style="width:auto; padding:0.75rem 2rem">
+          Go to Dashboard
+        </button>
+      `;
+      }
+
+      function showError(msg) {
+        document.getElementById("loading").textContent = "❌";
+        document.getElementById("status-title").textContent = "Payment Failed";
+        document.getElementById("status-title").style.color = "#991b1b";
+        document.getElementById("status-msg").textContent = msg;
+        document.getElementById("action-btn").innerHTML = `
+        <button onclick="window.location.href='${routes[role] || "/"}'" class="submit-btn" style="width:auto; padding:0.75rem 2rem; background:#991b1b">
+          Back to Dashboard
+        </button>
+      `;
+      }
+
+      verifyPayment();
+    </script>
+  </body>
+</html>

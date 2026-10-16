@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriNet — My Wallet</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+  </head>
+  <body class="bg-gradient">
+    <header class="header container">
+      <a
+        href="/"
+        style="
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 1.25rem;
+          color: #065f46;
+        "
+        >🌿 AgriNet</a
+      >
+      <div style="display: flex; align-items: center; gap: 0.75rem">
+        <span id="user-name" style="font-weight: 600; color: #065f46"></span>
+        <button class="btn-logout" onclick="goBack()">← Back</button>
+        <button class="btn-logout" onclick="logout()">Log Out</button>
+      </div>
+    </header>
+
+    <div class="dash-container">
+      <!-- Wallet Balance Cards -->
+      <div class="stats-row">
+        <div
+          class="stat-card"
+          style="
+            background: linear-gradient(135deg, #065f46, #10b981);
+            color: white;
+          "
+        >
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <div class="stat-value" id="wallet-balance" style="color: white">
+              ₦0
+            </div>
+            <div class="stat-label" style="color: rgba(255, 255, 255, 0.8)">
+              Available Balance
+            </div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-info">
+            <div class="stat-value" id="wallet-pending">₦0</div>
+            <div class="stat-label">Pending Balance</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📈</div>
+          <div class="stat-info">
+            <div class="stat-value" id="total-earned">₦0</div>
+            <div class="stat-label">Total Earned</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-tabs">
+        <button class="dash-tab active" onclick="showTab('withdraw', this)">
+          💸 Withdraw
+        </button>
+        <button class="dash-tab" onclick="showTab('history', this)">
+          📋 History
+        </button>
+        <button class="dash-tab" onclick="showTab('transactions', this)">
+          🔄 Transactions
+        </button>
+      </div>
+
+      <!-- Withdraw Tab -->
+      <div id="tab-withdraw" class="dash-tab-content active">
+        <div class="dash-card">
+          <h3>💸 Request Withdrawal</h3>
+          <div
+            style="
+              background: #fef3c7;
+              border-radius: 0.75rem;
+              padding: 1rem;
+              margin-bottom: 1rem;
+              font-size: 0.85rem;
+              color: #92400e;
+            "
+          >
+            ⚠️ Withdrawals are processed within 24-48 hours. Minimum withdrawal
+            is ₦1,000.
+          </div>
+          <div id="withdraw-msg" class="msg" style="display: none"></div>
+          <form id="withdraw-form">
+            <div class="form-group">
+              <label>Amount (₦)</label>
+              <input
+                type="number"
+                name="amount"
+                id="withdraw-amount"
+                placeholder="e.g. 5000"
+                min="1000"
+                required
+                oninput="updateWithdrawSummary()"
+              />
+            </div>
+            <div class="form-group">
+              <label>Bank Name</label>
+              <select name="bank_name" required>
+                <option value="">Select Bank</option>
+                <option>Access Bank</option>
+                <option>First Bank</option>
+                <option>GTBank</option>
+                <option>UBA</option>
+                <option>Zenith Bank</option>
+                <option>Fidelity Bank</option>
+                <option>Ecobank</option>
+                <option>Opay</option>
+                <option>Palmpay</option>
+                <option>Kuda Bank</option>
+                <option>Sterling Bank</option>
+                <option>Union Bank</option>
+                <option>Wema Bank</option>
+                <option>Stanbic IBTC</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Account Number</label>
+                <input
+                  type="text"
+                  name="account_number"
+                  placeholder="10-digit account number"
+                  maxlength="10"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Account Name</label>
+                <input
+                  type="text"
+                  name="account_name"
+                  placeholder="As it appears on your account"
+                  required
+                />
+              </div>
+            </div>
+            <div
+              id="withdraw-summary"
+              style="
+                display: none;
+                background: #f0fdf4;
+                border-radius: 0.75rem;
+                padding: 1rem;
+                margin-bottom: 1rem;
+              "
+            >
+              <p
+                style="
+                  margin: 0;
+                  font-size: 0.9rem;
+                  color: #065f46;
+                  font-weight: 600;
+                "
+              >
+                Withdrawal Summary
+              </p>
+              <p style="margin: 0.5rem 0 0; font-size: 0.85rem; color: #6b7280">
+                Amount:
+                <span
+                  id="summary-amount"
+                  style="color: #065f46; font-weight: 700"
+                ></span>
+              </p>
+            </div>
+            <button type="submit" class="submit-btn">Request Withdrawal</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- History Tab -->
+      <div id="tab-history" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>📋 Withdrawal History</h3>
+          <div id="withdrawal-history"></div>
+        </div>
+      </div>
+
+      <!-- Transactions Tab -->
+      <div id="tab-transactions" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>🔄 All Transactions</h3>
+          <div id="transactions-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      if (!token) window.location.href = "/login";
+
+      function goBack() {
+        const routes = {
+          farmer: "/farmer-dashboard",
+          vet: "/vet-dashboard",
+          investor: "/investor-dashboard",
+        };
+        window.location.href = routes[role] || "/";
+      }
+
+      function showTab(name, btn) {
+        document
+          .querySelectorAll(".dash-tab")
+          .forEach((t) => t.classList.remove("active"));
+        document
+          .querySelectorAll(".dash-tab-content")
+          .forEach((t) => t.classList.remove("active"));
+        document.getElementById(`tab-${name}`).classList.add("active");
+        btn.classList.add("active");
+      }
+
+      function logout() {
+        localStorage.clear();
+        window.location.href = "/";
+      }
+
+      async function api(url, options = {}) {
+        return fetch(url, {
+          ...options,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            ...(options.headers || {}),
+          },
+        });
+      }
+
+      function updateWithdrawSummary() {
+        const amount =
+          parseFloat(document.getElementById("withdraw-amount").value) || 0;
+        const summary = document.getElementById("withdraw-summary");
+        if (amount >= 1000) {
+          summary.style.display = "block";
+          document.getElementById("summary-amount").textContent =
+            `₦${amount.toLocaleString()}`;
+        } else {
+          summary.style.display = "none";
+        }
+      }
+
+      async function loadWallet() {
+        const res = await api("/wallet/balance");
+        const data = await res.json();
+        const meRes = await api("/auth/me");
+        const me = await meRes.json();
+        document.getElementById("user-name").textContent = me.full_name;
+        document.getElementById("wallet-balance").textContent =
+          `₦${(data.balance || 0).toLocaleString()}`;
+        document.getElementById("wallet-pending").textContent =
+          `₦${(data.pending || 0).toLocaleString()}`;
+        document.getElementById("total-earned").textContent =
+          `₦${(data.total_earned || 0).toLocaleString()}`;
+      }
+
+      async function loadWithdrawals() {
+        const res = await api("/wallet/withdrawals");
+        const withdrawals = await res.json();
+        const container = document.getElementById("withdrawal-history");
+        if (!withdrawals.length) {
+          container.innerHTML =
+            '<p style="color:#6b7280">No withdrawal requests yet.</p>';
+          return;
+        }
+        container.innerHTML = withdrawals
+          .map(
+            (w) => `
+        <div class="order-card">
+          <div class="order-info">
+            <h4>₦${w.amount.toLocaleString()}</h4>
+            <p>${w.bank_name} • ${w.account_number}</p>
+            <p style="font-size:0.8rem; color:#6b7280">${new Date(w.created_at).toLocaleDateString()}</p>
+          </div>
+          <span class="status-badge status-${w.status}">${w.status}</span>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      async function loadTransactions() {
+        const res = await api("/wallet/transactions");
+        const transactions = await res.json();
+        const container = document.getElementById("transactions-list");
+        if (!transactions.length) {
+          container.innerHTML =
+            '<p style="color:#6b7280">No transactions yet.</p>';
+          return;
+        }
+        container.innerHTML = transactions
+          .map(
+            (t) => `
+        <div class="order-card">
+          <div class="order-info">
+            <h4>${t.type.charAt(0).toUpperCase() + t.type.slice(1)} Payment</h4>
+            <p style="font-size:0.8rem; color:#6b7280">Ref: ${t.reference}</p>
+            <p style="font-size:0.8rem; color:#6b7280">${new Date(t.created_at).toLocaleDateString()}</p>
+          </div>
+          <div style="text-align:right">
+            <p style="font-weight:700; color:#065f46">₦${t.amount.toLocaleString()}</p>
+            <span class="status-badge status-${t.status === "success" ? "delivered" : t.status === "pending" ? "pending" : "cancelled"}">${t.status}</span>
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      document
+        .getElementById("withdraw-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          const body = Object.fromEntries(formData);
+          body.amount = parseFloat(body.amount);
+          const res = await api("/wallet/withdraw", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+          const data = await res.json();
+          const msg = document.getElementById("withdraw-msg");
+          msg.style.display = "block";
+          if (res.ok) {
+            msg.className = "msg success";
+            msg.textContent = data.message;
+            e.target.reset();
+            loadWallet();
+            loadWithdrawals();
+          } else {
+            msg.className = "msg error";
+            msg.textContent = data.detail || "Withdrawal failed";
+          }
+        });
+
+      loadWallet();
+      loadWithdrawals();
+      loadTransactions();
+    </script>
+  </body>
+</html>

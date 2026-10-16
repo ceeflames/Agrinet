@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -8,13 +8,25 @@
     <script defer src="/static/js/main.js"></script>
   </head>
   <body class="bg-gradient">
-
     <header class="header container flex justify-between">
       <div class="flex items-center gap-2">
-        <a href="/" style="text-decoration:none; font-weight:bold; font-size:1.5rem; color:#065f46">🌿 AgriNet</a>
+        <a
+          href="/"
+          style="
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #065f46;
+          "
+          >🌿 AgriNet</a
+        >
       </div>
       <div class="flex items-center gap-2">
-        <input type="text" id="search-input" placeholder="Search maize, tomato, goats…" />
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Search maize, tomato, goats…"
+        />
         <select id="category-filter">
           <option value="">All Categories</option>
           <option value="grains">Grains</option>
@@ -24,8 +36,12 @@
           <option value="dairy">Dairy</option>
         </select>
         <div class="auth-buttons" id="auth-buttons">
-          <button class="btn-login" onclick="window.location.href='/login'">Log In</button>
-          <button class="btn-signup" onclick="window.location.href='/signup'">Sign Up</button>
+          <button class="btn-login" onclick="window.location.href = '/login'">
+            Log In
+          </button>
+          <button class="btn-signup" onclick="window.location.href = '/signup'">
+            Sign Up
+          </button>
           <button>🛒 <span id="cart-count">0</span></button>
         </div>
       </div>
@@ -36,11 +52,43 @@
         <div class="card">
           <h3>Weather Forecast</h3>
           <select id="city-select">
-            <option value="Lagos">Lagos</option>
-            <option value="Abuja">Abuja</option>
-            <option value="Kano">Kano</option>
-            <option value="Port Harcourt">Port Harcourt</option>
+            <option value="Abia">Abia</option>
+            <option value="Adamawa">Adamawa</option>
+            <option value="Akwa Ibom">Akwa Ibom</option>
+            <option value="Anambra">Anambra</option>
+            <option value="Bauchi">Bauchi</option>
+            <option value="Bayelsa">Bayelsa</option>
+            <option value="Benue">Benue</option>
+            <option value="Borno">Borno</option>
+            <option value="Cross River">Cross River</option>
+            <option value="Delta">Delta</option>
+            <option value="Ebonyi">Ebonyi</option>
+            <option value="Edo">Edo</option>
+            <option value="Ekiti">Ekiti</option>
+            <option value="Enugu">Enugu</option>
+            <option value="Abuja">FCT Abuja</option>
+            <option value="Gombe">Gombe</option>
+            <option value="Imo">Imo</option>
+            <option value="Jigawa">Jigawa</option>
             <option value="Kaduna">Kaduna</option>
+            <option value="Kano">Kano</option>
+            <option value="Katsina">Katsina</option>
+            <option value="Kebbi">Kebbi</option>
+            <option value="Kogi">Kogi</option>
+            <option value="Kwara">Kwara</option>
+            <option value="Lagos">Lagos</option>
+            <option value="Nasarawa">Nasarawa</option>
+            <option value="Niger State">Niger State</option>
+            <option value="Ogun">Ogun</option>
+            <option value="Ondo">Ondo</option>
+            <option value="Osun">Osun</option>
+            <option value="Oyo">Oyo</option>
+            <option value="Plateau">Plateau</option>
+            <option value="Rivers">Rivers</option>
+            <option value="Sokoto">Sokoto</option>
+            <option value="Taraba">Taraba</option>
+            <option value="Yobe">Yobe</option>
+            <option value="Zamfara">Zamfara</option>
           </select>
           <div id="forecast" class="forecast-container"></div>
         </div>
@@ -59,11 +107,21 @@
 
       <section class="content">
         <div class="tabs">
-          <button class="tab-button active" data-target="market">Marketplace</button>
+          <button class="tab-button active" data-target="market">
+            Marketplace
+          </button>
           <button class="tab-button" data-target="invest">Invest</button>
-          <button class="tab-button" data-target="equip">Equip & Land</button>
+          <button
+            class="tab-button"
+            data-target="equip"
+            onclick="renderEquip('all')"
+          >
+            Equip & Land
+          </button>
           <button class="tab-button" data-target="cold">Cold Rooms</button>
-          <button class="tab-button" data-target="livestock">Livestock & Feeds</button>
+          <button class="tab-button" data-target="livestock">
+            Livestock & Feeds
+          </button>
           <button class="tab-button" data-target="vet">Veterinary</button>
         </div>
 
@@ -71,71 +129,172 @@
         <div id="market" class="tab-content active fade-in">
           <h3>Buy Farm Produce</h3>
           <div id="market-listings" class="product-grid">
-
             <div class="product-card">
-              <div class="product-photo" style="background-image: url('/static/images/maize.jpg')"></div>
+              <div
+                class="product-photo"
+                style="
+                  background-image: url(&quot;/static/images/maize.jpg&quot;);
+                "
+              ></div>
               <div class="product-body">
                 <span class="verified-badge">✅ Verified</span>
                 <h4>Maize (100kg bags)</h4>
                 <p class="product-meta">📍 Kaduna • per bag</p>
                 <p class="product-price">₦43,000</p>
                 <div class="product-buttons">
-                  <button class="add-to-cart-btn" data-item="Maize">Add to Cart</button>
-                  <button class="cold-room-btn">❄️ Cold Room</button>
+                  <button class="add-to-cart-btn" data-item="Maize">
+                    🛒 Add to Cart
+                  </button>
+                </div>
+                <div style="margin-top: 0.5rem">
+                  <button
+                    onclick="window.location.href = '/cold-room-booking'"
+                    style="
+                      width: 100%;
+                      padding: 0.4rem;
+                      background: #e0f2fe;
+                      color: #0369a1;
+                      border: none;
+                      border-radius: 0.5rem;
+                      cursor: pointer;
+                      font-size: 0.8rem;
+                      font-weight: 600;
+                    "
+                  >
+                    ❄️ Book Cold Room
+                  </button>
                 </div>
               </div>
             </div>
 
             <div class="product-card">
-              <div class="product-photo" style="background-image: url('/static/images/tomatoes.jpeg')"></div>
+              <div
+                class="product-photo"
+                style="
+                  background-image: url(&quot;/static/images/tomatoes.jpeg&quot;);
+                "
+              ></div>
               <div class="product-body">
                 <span class="verified-badge">✅ Verified</span>
                 <h4>Tomatoes (25kg crates)</h4>
                 <p class="product-meta">📍 Kano • per crate</p>
                 <p class="product-price">₦12,000</p>
                 <div class="product-buttons">
-                  <button class="add-to-cart-btn" data-item="Tomatoes">Add to Cart</button>
-                  <button class="cold-room-btn">❄️ Cold Room</button>
+                  <button class="add-to-cart-btn" data-item="Tomatoes">
+                    🛒 Add to Cart
+                  </button>
+                </div>
+                <div style="margin-top: 0.5rem">
+                  <button
+                    onclick="window.location.href = '/cold-room-booking'"
+                    style="
+                      width: 100%;
+                      padding: 0.4rem;
+                      background: #e0f2fe;
+                      color: #0369a1;
+                      border: none;
+                      border-radius: 0.5rem;
+                      cursor: pointer;
+                      font-size: 0.8rem;
+                      font-weight: 600;
+                    "
+                  >
+                    ❄️ Book Cold Room
+                  </button>
                 </div>
               </div>
             </div>
 
             <div class="product-card">
-              <div class="product-photo" style="background-image: url('/static/images/spinach.jpg')"></div>
+              <div
+                class="product-photo"
+                style="
+                  background-image: url(&quot;/static/images/spinach.jpg&quot;);
+                "
+              ></div>
               <div class="product-body">
                 <span class="verified-badge">✅ Verified</span>
                 <h4>Spinach (10kg bundles)</h4>
                 <p class="product-meta">📍 Lagos • per bundle</p>
                 <p class="product-price">₦5,500</p>
                 <div class="product-buttons">
-                  <button class="add-to-cart-btn" data-item="Spinach">Add to Cart</button>
-                  <button class="cold-room-btn">❄️ Cold Room</button>
+                  <button class="add-to-cart-btn" data-item="Spinach">
+                    🛒 Add to Cart
+                  </button>
+                </div>
+                <div style="margin-top: 0.5rem">
+                  <button
+                    onclick="window.location.href = '/cold-room-booking'"
+                    style="
+                      width: 100%;
+                      padding: 0.4rem;
+                      background: #e0f2fe;
+                      color: #0369a1;
+                      border: none;
+                      border-radius: 0.5rem;
+                      cursor: pointer;
+                      font-size: 0.8rem;
+                      font-weight: 600;
+                    "
+                  >
+                    ❄️ Book Cold Room
+                  </button>
                 </div>
               </div>
             </div>
 
             <div class="product-card">
-              <div class="product-photo" style="background-image: url('/static/images/beans.jpeg')"></div>
+              <div
+                class="product-photo"
+                style="
+                  background-image: url(&quot;/static/images/beans.jpeg&quot;);
+                "
+              ></div>
               <div class="product-body">
                 <span class="verified-badge">✅ Verified</span>
                 <h4>Beans (50kg bags)</h4>
                 <p class="product-meta">📍 Abuja • per bag</p>
                 <p class="product-price">₦38,000</p>
                 <div class="product-buttons">
-                  <button class="add-to-cart-btn" data-item="Beans">Add to Cart</button>
-                  <button class="cold-room-btn">❄️ Cold Room</button>
+                  <button class="add-to-cart-btn" data-item="Beans">
+                    🛒 Add to Cart
+                  </button>
+                </div>
+                <div style="margin-top: 0.5rem">
+                  <button
+                    onclick="window.location.href = '/cold-room-booking'"
+                    style="
+                      width: 100%;
+                      padding: 0.4rem;
+                      background: #e0f2fe;
+                      color: #0369a1;
+                      border: none;
+                      border-radius: 0.5rem;
+                      cursor: pointer;
+                      font-size: 0.8rem;
+                      font-weight: 600;
+                    "
+                  >
+                    ❄️ Book Cold Room
+                  </button>
                 </div>
               </div>
             </div>
-
           </div>
         </div>
 
         <!-- Invest -->
         <div id="invest" class="tab-content">
           <h3>Invest in Farmers</h3>
-          <div id="invest-auth-notice" style="display:none" class="seller-reg-notice">
-            <p>Please <a href="/login">log in</a> or <a href="/signup">sign up</a> to invest.</p>
+          <div
+            id="invest-auth-notice"
+            style="display: none"
+            class="seller-reg-notice"
+          >
+            <p>
+              Please <a href="/login">log in</a> or
+              <a href="/signup">sign up</a> to invest.
+            </p>
           </div>
           <form id="invest-form">
             <select name="crop">
@@ -143,7 +302,13 @@
               <option>Broilers (6 weeks)</option>
               <option>Catfish (4 months)</option>
             </select>
-            <input name="amount" type="number" placeholder="Amount (₦)" min="10000" required />
+            <input
+              name="amount"
+              type="number"
+              placeholder="Amount (₦)"
+              min="10000"
+              required
+            />
             <select name="tenor">
               <option>Short</option>
               <option>Medium</option>
@@ -156,142 +321,148 @@
         <!-- Equipment -->
         <div id="equip" class="tab-content">
           <h3>Equipment & Farmland</h3>
-          <div class="product-grid">
-
-            <div class="product-card">
-              <div class="product-photo" style="background-image: url('/static/images/water-pump.jpg')"></div>
-              <div class="product-body">
-                <h4>2 Water Pump</h4>
-                <p class="product-meta">📍 Ibadan</p>
-                <p class="product-price">₦95,000</p>
-                <div class="product-buttons">
-                  <button class="contact-btn">Contact Seller</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="product-card">
-              <div class="product-photo" style="background-image: url('/static/images/tractor.jpg')"></div>
-              <div class="product-body">
-                <h4>Tractor (Used, 75HP)</h4>
-                <p class="product-meta">📍 Katsina</p>
-                <p class="product-price">₦7,800,000</p>
-                <div class="product-buttons">
-                  <button class="contact-btn">Contact Seller</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="product-card">
-              <div class="product-photo" style="background-image: url('/static/images/sprayer.jpeg')"></div>
-              <div class="product-body">
-                <h4>Knapsack Sprayer</h4>
-                <p class="product-meta">📍 Enugu</p>
-                <p class="product-price">₦18,500</p>
-                <div class="product-buttons">
-                  <button class="contact-btn">Contact Seller</button>
-                </div>
-              </div>
-            </div>
-
+          <div
+            style="
+              display: flex;
+              gap: 0.5rem;
+              margin-bottom: 1rem;
+              flex-wrap: wrap;
+            "
+          >
+            <button
+              class="equip-filter active"
+              id="filter-all"
+              onclick="filterEquip('all', this)"
+              style="
+                padding: 0.4rem 0.9rem;
+                border-radius: 0.75rem;
+                border: none;
+                cursor: pointer;
+                background: #10b981;
+                color: white;
+                font-weight: 500;
+              "
+            >
+              All Listings
+            </button>
+            <button
+              class="equip-filter"
+              id="filter-equip"
+              onclick="filterEquip('equipment', this)"
+              style="
+                padding: 0.4rem 0.9rem;
+                border-radius: 0.75rem;
+                border: none;
+                cursor: pointer;
+                background: #d1fae5;
+                font-weight: 500;
+              "
+            >
+              🚜 Equipment
+            </button>
+            <button
+              class="equip-filter"
+              id="filter-land"
+              onclick="filterEquip('farmland', this)"
+              style="
+                padding: 0.4rem 0.9rem;
+                border-radius: 0.75rem;
+                border: none;
+                cursor: pointer;
+                background: #d1fae5;
+                font-weight: 500;
+              "
+            >
+              🌱 Farmland
+            </button>
+          </div>
+          <div id="equip-all-grid" class="product-grid">
+            <p style="color: #6b7280">Loading...</p>
           </div>
         </div>
 
         <!-- Cold Rooms -->
         <div id="cold" class="tab-content">
           <h3>Cold Room Access</h3>
-          <div class="product-grid">
-
-            <div class="product-card">
-              <div class="product-photo" style="background-image: url('/static/images/cold-lagos.jpg')"></div>
-              <div class="product-body">
-                <h4>Lagos Mainland Cold Hub</h4>
-                <p class="product-meta">📍 Lagos • 2–4°C</p>
-                <p class="product-meta">Slots Free: 12</p>
-                <p class="product-price">₦3,500/day</p>
-                <div class="product-buttons">
-                  <button class="contact-btn">Request Slot</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="product-card">
-              <div class="product-photo" style="background-image: url('/static/images/cold-kano.jpg')"></div>
-              <div class="product-body">
-                <h4>Kano Produce Cold Store</h4>
-                <p class="product-meta">📍 Kano • 0–2°C</p>
-                <p class="product-meta">Slots Free: 5</p>
-                <p class="product-price">₦3,000/day</p>
-                <div class="product-buttons">
-                  <button class="contact-btn">Request Slot</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="product-card">
-              <div class="product-photo" style="background-image: url('/static/images/cold-abuja.jpeg')"></div>
-              <div class="product-body">
-                <h4>Abuja Fresh Cold Store</h4>
-                <p class="product-meta">📍 Abuja • 1–3°C</p>
-                <p class="product-meta">Slots Free: 8</p>
-                <p class="product-price">₦4,000/day</p>
-                <div class="product-buttons">
-                  <button class="contact-btn">Request Slot</button>
-                </div>
-              </div>
-            </div>
-
+          <div id="cold-rooms-grid" class="product-grid">
+            <p style="color: #6b7280">Loading cold rooms...</p>
           </div>
         </div>
 
         <!-- Livestock -->
         <div id="livestock" class="tab-content">
           <h3>Livestock & Feeds</h3>
-          <button id="intl-toggle" onclick="toggleInternational()" style="margin-bottom:1rem">Show International Breeds</button>
-
+          <button
+            id="intl-toggle"
+            onclick="toggleInternational()"
+            style="margin-bottom: 1rem"
+          >
+            Show International Breeds
+          </button>
           <div id="local-feeds" class="product-grid">
-
             <div class="product-card">
-              <div class="product-photo" style="background-image: url('/static/images/broiler-feed.jpg')"></div>
+              <div
+                class="product-photo"
+                style="
+                  background-image: url(&quot;/static/images/broiler-feed.jpg&quot;);
+                "
+              ></div>
               <div class="product-body">
                 <h4>Broiler Starter (25kg)</h4>
                 <p class="product-meta">Species: Poultry</p>
                 <p class="product-price">₦10,500</p>
                 <div class="product-buttons">
-                  <button class="add-to-cart-btn" data-item="Broiler Starter">Add to Cart</button>
+                  <button class="add-to-cart-btn" data-item="Broiler Starter">
+                    🛒 Add to Cart
+                  </button>
                 </div>
               </div>
             </div>
-
             <div class="product-card">
-              <div class="product-photo" style="background-image: url('/static/images/catfish-feed.jpg')"></div>
+              <div
+                class="product-photo"
+                style="
+                  background-image: url(&quot;/static/images/catfish-feed.jpg&quot;);
+                "
+              ></div>
               <div class="product-body">
                 <h4>Catfish Grower (15kg)</h4>
                 <p class="product-meta">Species: Fish</p>
                 <p class="product-price">₦8,700</p>
                 <div class="product-buttons">
-                  <button class="add-to-cart-btn" data-item="Catfish Grower">Add to Cart</button>
+                  <button class="add-to-cart-btn" data-item="Catfish Grower">
+                    🛒 Add to Cart
+                  </button>
                 </div>
               </div>
             </div>
-
             <div class="product-card">
-              <div class="product-photo" style="background-image: url('/static/images/goat.jpg')"></div>
+              <div
+                class="product-photo"
+                style="
+                  background-image: url(&quot;/static/images/goat.jpg&quot;);
+                "
+              ></div>
               <div class="product-body">
                 <h4>WAD Goat (6 months)</h4>
                 <p class="product-meta">Species: Goat</p>
                 <p class="product-price">₦45,000</p>
                 <div class="product-buttons">
-                  <button class="add-to-cart-btn" data-item="WAD Goat">Add to Cart</button>
+                  <button class="add-to-cart-btn" data-item="WAD Goat">
+                    🛒 Add to Cart
+                  </button>
                 </div>
               </div>
             </div>
-
           </div>
-
-          <div id="foreign-breeds" class="product-grid" style="display:none">
+          <div id="foreign-breeds" class="product-grid" style="display: none">
             <div class="product-card">
-              <div class="product-photo" style="background-image: url('/static/images/sasso.jpg')"></div>
+              <div
+                class="product-photo"
+                style="
+                  background-image: url(&quot;/static/images/sasso.jpg&quot;);
+                "
+              ></div>
               <div class="product-body">
                 <h4>Sasso Chick (day-old)</h4>
                 <p class="product-meta">Origin: France • Min Order: 200</p>
@@ -306,44 +477,78 @@
         <!-- Vet -->
         <div id="vet" class="tab-content">
           <h3>Veterinary & Extension</h3>
-          <div id="vet-auth-notice" style="display:none" class="seller-reg-notice">
-            <p>Please <a href="/login">log in</a> or <a href="/signup">sign up</a> to ask a vet.</p>
+          <div
+            id="vet-auth-notice"
+            style="display: none"
+            class="seller-reg-notice"
+          >
+            <p>
+              Please <a href="/login">log in</a> or
+              <a href="/signup">sign up</a> to ask a vet.
+            </p>
           </div>
           <form id="vet-form">
-            <input name="question" placeholder="Ask your farming or animal health question…" required />
+            <input
+              name="question"
+              placeholder="Ask your farming or animal health question…"
+              required
+            />
             <button type="submit">Ask Vet</button>
           </form>
         </div>
-
       </section>
     </main>
 
-    <footer class="footer container">
-      © 2025 AgriNet • My Farm And I.
-    </footer>
+    <footer class="footer container">© 2025 AgriNet • My Farm And I.</footer>
 
     <script>
-      const token = localStorage.getItem('token');
-      const role = localStorage.getItem('role');
-      const name = localStorage.getItem('name');
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      const name = localStorage.getItem("name");
+
+      const dashRoutes = {
+        farmer: "/farmer-dashboard",
+        consumer: "/consumer-dashboard",
+        investor: "/investor-dashboard",
+        vet: "/vet-dashboard",
+        admin: "/admin-dashboard",
+      };
+
+      function gotoDashboard() {
+        window.location.href = dashRoutes[localStorage.getItem("role")] || "/";
+      }
+
+      function logout() {
+        localStorage.clear();
+        window.location.href = "/";
+      }
 
       function updateAuthUI() {
-        const authButtons = document.getElementById('auth-buttons');
-        const sellerCard = document.getElementById('seller-reg-content');
+        const authButtons = document.getElementById("auth-buttons");
+        const sellerCard = document.getElementById("seller-reg-content");
+
         if (token && name) {
           authButtons.innerHTML = `
             <span class="user-greeting">👤 ${name}</span>
-            <button class="btn-dashboard" onclick="window.location.href='/dashboard'">Dashboard</button>
+            <button class="btn-dashboard" onclick="gotoDashboard()">Dashboard</button>
             <button class="btn-logout" onclick="logout()">Log Out</button>
             <button>🛒 <span id="cart-count">0</span></button>
           `;
-          sellerCard.innerHTML = role === 'farmer'
-            ? `<div class="seller-reg-notice"><p>✅ Registered as a farmer.</p><a href="/dashboard">List produce →</a></div>`
-            : `<div class="seller-reg-notice"><p>Want to sell?</p><a href="/signup">Register as Farmer →</a></div>`;
-          document.getElementById('invest-auth-notice').style.display = 'none';
-          document.getElementById('invest-form').style.display = 'block';
-          document.getElementById('vet-auth-notice').style.display = 'none';
-          document.getElementById('vet-form').style.display = 'block';
+          if (role === "farmer") {
+            sellerCard.innerHTML = `<div class="seller-reg-notice"><p>✅ Registered as a farmer.</p><a href="/farmer-dashboard">List produce →</a></div>`;
+          } else if (role === "consumer") {
+            sellerCard.innerHTML = `<div class="seller-reg-notice"><p>🛒 You are logged in as a buyer.</p><a href="/consumer-dashboard">Go to your dashboard →</a></div>`;
+          } else if (role === "investor") {
+            sellerCard.innerHTML = `<div class="seller-reg-notice"><p>💰 You are logged in as an investor.</p><a href="/investor-dashboard">Go to your dashboard →</a></div>`;
+          } else if (role === "vet") {
+            sellerCard.innerHTML = `<div class="seller-reg-notice"><p>🩺 You are logged in as a vet.</p><a href="/vet-dashboard">Go to your dashboard →</a></div>`;
+          } else {
+            sellerCard.innerHTML = `<div class="seller-reg-notice"><p>Want to sell on AgriNet?</p><a href="/signup">Register as Farmer →</a></div>`;
+          }
+          document.getElementById("invest-auth-notice").style.display = "none";
+          document.getElementById("invest-form").style.display = "block";
+          document.getElementById("vet-auth-notice").style.display = "none";
+          document.getElementById("vet-form").style.display = "block";
         } else {
           authButtons.innerHTML = `
             <button class="btn-login" onclick="window.location.href='/login'">Log In</button>
@@ -354,52 +559,62 @@
             <div class="seller-reg-notice"><p>Want to sell on AgriNet?</p><a href="/signup">Create a Farmer Account →</a></div>
             <small style="color:#6b7280;display:block;margin-top:0.5rem">KYC & verification required.</small>
           `;
-          document.getElementById('invest-auth-notice').style.display = 'block';
-          document.getElementById('invest-form').style.display = 'none';
-          document.getElementById('vet-auth-notice').style.display = 'block';
-          document.getElementById('vet-form').style.display = 'none';
+          document.getElementById("invest-auth-notice").style.display = "block";
+          document.getElementById("invest-form").style.display = "none";
+          document.getElementById("vet-auth-notice").style.display = "block";
+          document.getElementById("vet-form").style.display = "none";
         }
       }
 
-      function logout() { localStorage.clear(); window.location.href = '/'; }
-
       // Tabs
-      document.querySelectorAll('.tab-button').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-          btn.classList.add('active');
-          document.getElementById(btn.dataset.target).classList.add('active');
+      document.querySelectorAll(".tab-button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".tab-button")
+            .forEach((b) => b.classList.remove("active"));
+          document
+            .querySelectorAll(".tab-content")
+            .forEach((c) => c.classList.remove("active"));
+          btn.classList.add("active");
+          document.getElementById(btn.dataset.target).classList.add("active");
         });
       });
 
       function switchTab(target) {
-        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelector(`[data-target="${target}"]`).classList.add('active');
-        document.getElementById(target).classList.add('active');
+        document
+          .querySelectorAll(".tab-button")
+          .forEach((b) => b.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((c) => c.classList.remove("active"));
+        document
+          .querySelector(`[data-target="${target}"]`)
+          .classList.add("active");
+        document.getElementById(target).classList.add("active");
       }
 
-      // International breeds toggle
-      window.toggleInternational = function() {
-        const fb = document.getElementById('foreign-breeds');
-        const btn = document.getElementById('intl-toggle');
+      window.toggleInternational = function () {
+        const fb = document.getElementById("foreign-breeds");
+        const btn = document.getElementById("intl-toggle");
         if (!fb || !btn) return;
-        const isVisible = fb.style.display === 'grid';
-        fb.style.display = isVisible ? 'none' : 'grid';
-        btn.textContent = isVisible ? 'Show International Breeds' : 'Hide International Breeds';
-      }
+        const isVisible = fb.style.display === "grid";
+        fb.style.display = isVisible ? "none" : "grid";
+        btn.textContent = isVisible
+          ? "Show International Breeds"
+          : "Hide International Breeds";
+      };
 
-      // Load produce from DB
       async function loadProduce() {
         try {
-          const res = await fetch('/produce');
+          const res = await fetch("/produce");
           const produce = await res.json();
           if (produce && produce.length > 0) {
-            document.getElementById('market-listings').innerHTML = produce.map(p => `
+            document.getElementById("market-listings").innerHTML = produce
+              .map(
+                (p) => `
               <div class="product-card">
-                <div class="product-photo" style="${p.image_path ? `background-image: url('${p.image_path}')` : 'background-color:#f3f4f6'}">
-                  ${!p.image_path ? '<div class="no-photo">No photo</div>' : ''}
+                <div class="product-photo" style="${p.image_path ? `background-image: url('${p.image_path}')` : "background-color:#f3f4f6"}">
+                  ${!p.image_path ? '<div class="no-photo">No photo</div>' : ""}
                 </div>
                 <div class="product-body">
                   <span class="verified-badge">✅ Verified</span>
@@ -407,32 +622,165 @@
                   <p class="product-meta">📍 ${p.location} • per ${p.unit}</p>
                   <p class="product-price">₦${p.price.toLocaleString()}</p>
                   <div class="product-buttons">
-                    <button class="add-to-cart-btn" data-item="${p.title}">Add to Cart</button>
-                    <button class="cold-room-btn">❄️ Cold Room</button>
+                    <button class="add-to-cart-btn" data-item="${p.title}">🛒 Add to Cart</button>
+                  </div>
+                  <div style="margin-top:0.5rem">
+                    <button style="width:100%; padding:0.4rem; background:#e0f2fe; color:#0369a1; border:none; border-radius:0.5rem; cursor:pointer; font-size:0.8rem; font-weight:600" onclick="window.location.href='/cold-room-booking'">❄️ Book Cold Room</button>
                   </div>
                 </div>
               </div>
-            `).join('');
+            `,
+              )
+              .join("");
           }
-        } catch (err) { console.log('Using static listings'); }
+        } catch (err) {
+          console.log("Using static listings");
+        }
       }
 
-      document.getElementById('invest-form').addEventListener('submit', (e) => {
+      document.getElementById("invest-form").addEventListener("submit", (e) => {
         e.preventDefault();
-        if (!token) { window.location.href = '/login'; return; }
-        alert('Investment pledge submitted! Our team will contact you shortly.');
+        if (!token) {
+          window.location.href = "/login";
+          return;
+        }
+        if (role !== "investor") {
+          alert(
+            "Please log in as an investor to invest. Go to your dashboard instead.",
+          );
+          gotoDashboard();
+          return;
+        }
+        window.location.href = "/investor-dashboard";
       });
 
-      document.getElementById('vet-form').addEventListener('submit', (e) => {
+      document.getElementById("vet-form").addEventListener("submit", (e) => {
         e.preventDefault();
-        if (!token) { window.location.href = '/login'; return; }
-        alert('Your question has been submitted. A vet will respond shortly.');
+        if (!token) {
+          window.location.href = "/login";
+          return;
+        }
+        alert("Your question has been submitted. A vet will respond shortly.");
         e.target.reset();
       });
 
+      let allEquipItems = [];
+
+      async function loadAllEquip() {
+        try {
+          const [eqRes, landRes] = await Promise.all([
+            fetch("/equipment"),
+            fetch("/farmland"),
+          ]);
+          const equipment = await eqRes.json();
+          const farmland = await landRes.json();
+
+          const equipCards = equipment.map((e) => ({
+            type: "equipment",
+            html: `<div class="product-card" data-type="equipment">
+              <div class="product-photo" style="${e.image_path ? `background-image:url('${e.image_path}')` : "background:#f0fdf4; display:flex; align-items:center; justify-content:center; font-size:2.5rem"}">
+                ${!e.image_path ? "🚜" : ""}
+              </div>
+              <div class="product-body">
+                <span class="verified-badge" style="background:${e.listing_type === "rent" ? "#dbeafe" : "#d1fae5"}; color:${e.listing_type === "rent" ? "#1e40af" : "#065f46"}">${e.listing_type === "rent" ? "🔄 For Rent" : "💰 For Sale"}</span>
+                <h4>${e.title}</h4>
+                <p class="product-meta">📍 ${e.location}, ${e.state}</p>
+                <p class="product-meta">Condition: ${e.condition}</p>
+                <p class="product-price">₦${e.price.toLocaleString()}${e.rent_period ? "/" + e.rent_period : ""}</p>
+                <div class="product-buttons">
+                  <button class="contact-btn" onclick="window.location.href='/equipment-listing'">View & Book</button>
+                </div>
+              </div>
+            </div>`,
+          }));
+
+          const landCards = farmland.map((l) => ({
+            type: "farmland",
+            html: `<div class="product-card" data-type="farmland">
+              <div class="product-photo" style="${l.image_path ? `background-image:url('${l.image_path}')` : "background:linear-gradient(135deg,#d1fae5,#a7f3d0); display:flex; align-items:center; justify-content:center; font-size:2.5rem"}">
+                ${!l.image_path ? "🌱" : ""}
+              </div>
+              <div class="product-body">
+                <span class="verified-badge">🌱 Farmland</span>
+                <h4>${l.title}</h4>
+                <p class="product-meta">📍 ${l.location}, ${l.state}</p>
+                <p class="product-meta">📐 ${l.size_hectares} hectares${l.soil_type ? " • " + l.soil_type : ""}</p>
+                <p class="product-price">₦${l.price_per_season.toLocaleString()}/${l.rent_period}</p>
+                <div class="product-buttons">
+                  <button class="contact-btn" onclick="window.location.href='/farmland-listing'">View & Book</button>
+                </div>
+              </div>
+            </div>`,
+          }));
+
+          allEquipItems = [...equipCards, ...landCards];
+          renderEquip("all");
+        } catch (e) {
+          console.log("Equip load error", e);
+        }
+      }
+
+      function renderEquip(filter) {
+        const grid = document.getElementById("equip-all-grid");
+        const filtered =
+          filter === "all"
+            ? allEquipItems
+            : allEquipItems.filter((i) => i.type === filter);
+        if (!filtered.length) {
+          grid.innerHTML = `<p style="color:#6b7280">No ${filter === "all" ? "listings" : filter} yet.</p>`;
+          return;
+        }
+        grid.innerHTML = filtered.map((i) => i.html).join("");
+      }
+
+      function filterEquip(type, btn) {
+        document.querySelectorAll(".equip-filter").forEach((b) => {
+          b.style.background = "#d1fae5";
+          b.style.color = "#111827";
+        });
+        btn.style.background = "#10b981";
+        btn.style.color = "white";
+        renderEquip(type);
+      }
+
+      async function loadColdRooms() {
+        try {
+          const res = await fetch("/cold-rooms");
+          const rooms = await res.json();
+          const grid = document.getElementById("cold-rooms-grid");
+          if (!rooms.length) {
+            grid.innerHTML =
+              '<p style="color:#6b7280">No cold rooms listed yet.</p>';
+            return;
+          }
+          grid.innerHTML = rooms
+            .map(
+              (r) => `
+            <div class="product-card">
+              <div class="product-photo" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe); display:flex; align-items:center; justify-content:center; font-size:2.5rem">❄️</div>
+              <div class="product-body">
+                <h4>${r.name}</h4>
+                <p class="product-meta">📍 ${r.city}, ${r.state}</p>
+                <p class="product-meta">🌡 ${r.temperature}</p>
+                <p class="product-meta" style="color:${r.available_slots > 5 ? "#065f46" : "#f59e0b"}">${r.available_slots} slots free of ${r.total_slots}</p>
+                <p class="product-price">₦${r.rate_per_day.toLocaleString()}/day</p>
+                <div class="product-buttons">
+                  <button class="contact-btn" onclick="window.location.href='/cold-room-booking'">Book Slot</button>
+                </div>
+              </div>
+            </div>
+          `,
+            )
+            .join("");
+        } catch (e) {
+          console.log("Cold rooms load error", e);
+        }
+      }
+
       updateAuthUI();
       loadProduce();
+      loadAllEquip();
+      loadColdRooms();
     </script>
-  </head>
   </body>
 </html>

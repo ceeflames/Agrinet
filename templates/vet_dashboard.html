@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriNet — Vet Dashboard</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+  </head>
+  <body class="bg-gradient">
+    <header class="header container">
+      <a
+        href="/"
+        style="
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 1.25rem;
+          color: #065f46;
+        "
+        >🌿 AgriNet</a
+      >
+      <div style="display: flex; align-items: center; gap: 0.75rem">
+        <span id="user-name" style="font-weight: 600; color: #065f46"></span>
+        <span class="role-badge vet-badge">🩺 Vet</span>
+        <button class="btn-logout" onclick="logout()">Log Out</button>
+      </div>
+    </header>
+
+    <div class="dash-container">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon">❓</div>
+          <div class="stat-info">
+            <div class="stat-value" id="open-questions">0</div>
+            <div class="stat-label">Open Questions</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <div class="stat-value" id="answered-questions">0</div>
+            <div class="stat-label">Answered</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-info">
+            <div class="stat-value" id="upcoming-consultations">0</div>
+            <div class="stat-label">Consultations</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-info">
+            <div class="stat-value" id="verification-status">Pending</div>
+            <div class="stat-label">Verification</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-tabs">
+        <button class="dash-tab active" onclick="showTab('questions', this)">
+          ❓ Questions
+        </button>
+        <button class="dash-tab" onclick="showTab('consultations', this)">
+          📅 Consultations
+        </button>
+        <button class="dash-tab" onclick="showTab('profile', this)">
+          👤 My Profile
+        </button>
+      </div>
+
+      <!-- Questions Tab -->
+      <div id="tab-questions" class="dash-tab-content active">
+        <div class="dash-card">
+          <h3>❓ Open Questions from Farmers</h3>
+          <div id="open-questions-list"></div>
+        </div>
+        <div class="dash-card">
+          <h3>✅ Questions I Answered</h3>
+          <div id="answered-questions-list"></div>
+        </div>
+      </div>
+
+      <!-- Consultations Tab -->
+      <div id="tab-consultations" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>📅 Schedule a Consultation</h3>
+          <div id="consult-msg" class="msg" style="display: none"></div>
+          <form id="consult-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Topic</label>
+                <input
+                  type="text"
+                  name="topic"
+                  placeholder="e.g. Poultry Disease Management"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Date & Time</label>
+                <input type="datetime-local" name="scheduled_at" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Notes (optional)</label>
+              <textarea
+                name="notes"
+                placeholder="Additional details..."
+              ></textarea>
+            </div>
+            <button type="submit" class="submit-btn">
+              Schedule Consultation
+            </button>
+          </form>
+        </div>
+        <div class="dash-card">
+          <h3>📋 My Consultations</h3>
+          <div id="consultations-list"></div>
+        </div>
+      </div>
+
+      <!-- Profile Tab -->
+      <div id="tab-profile" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>👤 My Profile & Credentials</h3>
+          <div id="profile-msg" class="msg" style="display: none"></div>
+          <form id="profile-form">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input
+                type="text"
+                id="profile-name"
+                disabled
+                style="background: #f3f4f6"
+              />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input
+                type="text"
+                id="profile-email"
+                disabled
+                style="background: #f3f4f6"
+              />
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input
+                type="text"
+                id="profile-phone"
+                disabled
+                style="background: #f3f4f6"
+              />
+            </div>
+            <div class="form-group">
+              <label>Bio / Specialization</label>
+              <textarea
+                name="bio"
+                id="bio-input"
+                placeholder="Describe your veterinary specialization and experience..."
+                style="height: 120px"
+              ></textarea>
+            </div>
+            <button type="submit" class="submit-btn">Update Profile</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Answer Modal -->
+    <div
+      id="answer-modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        style="
+          background: white;
+          border-radius: 1.5rem;
+          padding: 2rem;
+          max-width: 500px;
+          width: 90%;
+          margin: auto;
+        "
+      >
+        <h3>Answer Question</h3>
+        <p
+          id="modal-question"
+          style="
+            background: #f0fdf4;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin: 1rem 0;
+            color: #065f46;
+          "
+        ></p>
+        <div class="form-group">
+          <label>Your Answer</label>
+          <textarea
+            id="answer-text"
+            style="height: 120px"
+            placeholder="Type your professional answer..."
+          ></textarea>
+        </div>
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem">
+          <button class="submit-btn" onclick="submitAnswer()">
+            Submit Answer
+          </button>
+          <button
+            onclick="closeAnswerModal()"
+            style="
+              flex: 1;
+              padding: 0.75rem;
+              background: #f3f4f6;
+              border: none;
+              border-radius: 0.75rem;
+              cursor: pointer;
+            "
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      if (!token || role !== "vet") window.location.href = "/login";
+      let currentQuestionId = null;
+
+      function showTab(name, btn) {
+        document
+          .querySelectorAll(".dash-tab")
+          .forEach((t) => t.classList.remove("active"));
+        document
+          .querySelectorAll(".dash-tab-content")
+          .forEach((t) => t.classList.remove("active"));
+        document.getElementById(`tab-${name}`).classList.add("active");
+        btn.classList.add("active");
+      }
+
+      function logout() {
+        localStorage.clear();
+        window.location.href = "/";
+      }
+
+      async function api(url, options = {}) {
+        return fetch(url, {
+          ...options,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            ...(options.headers || {}),
+          },
+        });
+      }
+
+      async function loadProfile() {
+        const res = await api("/auth/me");
+        const user = await res.json();
+        document.getElementById("user-name").textContent = user.full_name;
+        document.getElementById("profile-name").value = user.full_name;
+        document.getElementById("profile-email").value = user.email;
+        document.getElementById("profile-phone").value = user.phone;
+        document.getElementById("verification-status").textContent =
+          user.is_verified ? "Verified ✅" : "Pending ⏳";
+        if (user.bio) document.getElementById("bio-input").value = user.bio;
+      }
+
+      async function loadQuestions() {
+        const res = await api("/vet/questions");
+        const questions = await res.json();
+        const open = questions.filter((q) => q.status === "open");
+        const answered = questions.filter((q) => q.status === "answered");
+        document.getElementById("open-questions").textContent = open.length;
+        document.getElementById("answered-questions").textContent =
+          answered.length;
+
+        const openContainer = document.getElementById("open-questions-list");
+        openContainer.innerHTML = open.length
+          ? open
+              .map(
+                (q) => `
+        <div class="order-card">
+          <div class="order-info">
+            <p style="font-weight:600">${q.question}</p>
+            <p style="font-size:0.8rem; color:#6b7280">From: ${q.user_name} • ${new Date(q.created_at).toLocaleDateString()}</p>
+          </div>
+          <button class="submit-btn" style="width:auto; padding:0.4rem 0.75rem; font-size:0.85rem" onclick="openAnswerModal(${q.id}, '${q.question.replace(/'/g, "\\'")}')">Answer</button>
+        </div>
+      `,
+              )
+              .join("")
+          : '<p style="color:#6b7280">No open questions.</p>';
+
+        const answeredContainer = document.getElementById(
+          "answered-questions-list",
+        );
+        answeredContainer.innerHTML = answered.length
+          ? answered
+              .map(
+                (q) => `
+        <div class="order-card">
+          <div class="order-info">
+            <p style="font-weight:600">${q.question}</p>
+            <p style="color:#065f46; margin-top:0.5rem">✅ ${q.answer}</p>
+            <p style="font-size:0.75rem; color:#9ca3af">${q.answered_at ? new Date(q.answered_at).toLocaleDateString() : ""}</p>
+          </div>
+        </div>
+      `,
+              )
+              .join("")
+          : '<p style="color:#6b7280">No answered questions yet.</p>';
+      }
+
+      function openAnswerModal(id, question) {
+        currentQuestionId = id;
+        document.getElementById("modal-question").textContent = question;
+        document.getElementById("answer-text").value = "";
+        document.getElementById("answer-modal").style.display = "flex";
+      }
+
+      function closeAnswerModal() {
+        document.getElementById("answer-modal").style.display = "none";
+      }
+
+      async function submitAnswer() {
+        const answer = document.getElementById("answer-text").value;
+        if (!answer) {
+          alert("Please write an answer");
+          return;
+        }
+        const res = await api(`/vet/answer/${currentQuestionId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ answer }),
+        });
+        if (res.ok) {
+          closeAnswerModal();
+          loadQuestions();
+        } else {
+          alert("Failed to submit answer");
+        }
+      }
+
+      async function loadConsultations() {
+        const res = await api("/vet/consultations");
+        const consultations = await res.json();
+        document.getElementById("upcoming-consultations").textContent =
+          consultations.filter((c) => c.status === "scheduled").length;
+        const container = document.getElementById("consultations-list");
+        if (!consultations.length) {
+          container.innerHTML =
+            '<p style="color:#6b7280">No consultations yet.</p>';
+          return;
+        }
+        container.innerHTML = consultations
+          .map(
+            (c) => `
+        <div class="order-card">
+          <div class="order-info">
+            <h4>${c.topic}</h4>
+            <p>📅 ${new Date(c.scheduled_at).toLocaleString()}</p>
+            ${c.notes ? `<p style="color:#6b7280; font-size:0.85rem">${c.notes}</p>` : ""}
+          </div>
+          <span class="status-badge status-${c.status}">${c.status}</span>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      document
+        .getElementById("consult-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          const body = Object.fromEntries(formData);
+          const res = await api("/vet/consultations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+          const msg = document.getElementById("consult-msg");
+          msg.style.display = "block";
+          if (res.ok) {
+            msg.className = "msg success";
+            msg.textContent = "Consultation scheduled!";
+            e.target.reset();
+            loadConsultations();
+          } else {
+            msg.className = "msg error";
+            msg.textContent = "Failed to schedule";
+          }
+        });
+
+      document
+        .getElementById("profile-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const bio = document.getElementById("bio-input").value;
+          const res = await api("/auth/update-profile", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bio }),
+          });
+          const msg = document.getElementById("profile-msg");
+          msg.style.display = "block";
+          if (res.ok) {
+            msg.className = "msg success";
+            msg.textContent = "Profile updated!";
+          } else {
+            msg.className = "msg error";
+            msg.textContent = "Failed to update";
+          }
+        });
+
+      loadProfile();
+      loadQuestions();
+      loadConsultations();
+    </script>
+  </body>
+</html>

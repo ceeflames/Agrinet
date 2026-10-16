@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriNet — Admin Panel</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+    <style>
+      .admin-header {
+        background: #065f46;
+        color: white;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .admin-header h1 {
+        margin: 0;
+        font-size: 1.25rem;
+      }
+      .admin-nav {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+      }
+      .admin-nav-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 0.75rem;
+        border: none;
+        cursor: pointer;
+        background: #d1fae5;
+        color: #065f46;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+      }
+      .admin-nav-btn.active {
+        background: #065f46;
+        color: white;
+      }
+      .admin-section {
+        display: none;
+      }
+      .admin-section.active {
+        display: block;
+      }
+      .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .analytics-card {
+        background: white;
+        border-radius: 1.25rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        text-align: center;
+      }
+      .analytics-card .value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #065f46;
+      }
+      .analytics-card .label {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+      }
+      .analytics-card .icon {
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        background: #f0fdf4;
+        padding: 0.75rem 1rem;
+        text-align: left;
+        font-size: 0.85rem;
+        color: #065f46;
+        border-bottom: 2px solid #e5e7eb;
+      }
+      td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 0.85rem;
+        vertical-align: middle;
+      }
+      tr:hover {
+        background: #f9fafb;
+      }
+      .action-btn {
+        padding: 0.3rem 0.65rem;
+        border-radius: 0.4rem;
+        border: none;
+        cursor: pointer;
+        font-size: 0.78rem;
+        font-weight: 600;
+        margin-right: 0.25rem;
+      }
+      .btn-verify {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .btn-reject {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .btn-suspend {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .btn-delete {
+        background: #991b1b;
+        color: white;
+      }
+      .search-bar {
+        width: 100%;
+        padding: 0.6rem 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid #d1d5db;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        box-sizing: border-box;
+      }
+      .filter-row {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+      }
+      .filter-row select {
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        font-size: 0.85rem;
+      }
+      .table-wrapper {
+        overflow-x: auto;
+      }
+      .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #9ca3af;
+      }
+      @media (max-width: 768px) {
+        .analytics-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .admin-nav {
+          gap: 0.25rem;
+        }
+        .admin-nav-btn {
+          font-size: 0.75rem;
+          padding: 0.4rem 0.6rem;
+        }
+      }
+    </style>
+  </head>
+  <body style="background: #f9fafb">
+    <div class="admin-header">
+      <h1>🌿 AgriNet Admin Panel</h1>
+      <div style="display: flex; align-items: center; gap: 1rem">
+        <span id="admin-name" style="font-size: 0.9rem; opacity: 0.9"></span>
+        <button
+          onclick="logout()"
+          style="
+            padding: 0.4rem 0.9rem;
+            border-radius: 0.5rem;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+          "
+        >
+          Log Out
+        </button>
+      </div>
+    </div>
+
+    <div class="dash-container" style="padding-top: 1.5rem">
+      <!-- Nav -->
+      <div class="admin-nav">
+        <button class="admin-nav-btn active" onclick="showSection('analytics')">
+          📊 Analytics
+        </button>
+        <button class="admin-nav-btn" onclick="showSection('users')">
+          👥 Users
+        </button>
+        <button class="admin-nav-btn" onclick="showSection('produce')">
+          🌾 Produce
+        </button>
+        <button class="admin-nav-btn" onclick="showSection('orders')">
+          📦 Orders
+        </button>
+        <button class="admin-nav-btn" onclick="showSection('investments')">
+          💰 Investments
+        </button>
+        <button class="admin-nav-btn" onclick="showSection('vet-questions')">
+          🩺 Vet Questions
+        </button>
+      </div>
+
+      <!-- Analytics -->
+      <div id="section-analytics" class="admin-section active">
+        <div class="analytics-grid">
+          <div class="analytics-card">
+            <div class="icon">👥</div>
+            <div class="value" id="stat-users">0</div>
+            <div class="label">Total Users</div>
+          </div>
+          <div class="analytics-card">
+            <div class="icon">🌾</div>
+            <div class="value" id="stat-produce">0</div>
+            <div class="label">Produce Listings</div>
+          </div>
+          <div class="analytics-card">
+            <div class="icon">📦</div>
+            <div class="value" id="stat-orders">0</div>
+            <div class="label">Total Orders</div>
+          </div>
+          <div class="analytics-card">
+            <div class="icon">💰</div>
+            <div class="value" id="stat-investments">₦0</div>
+            <div class="label">Total Invested</div>
+          </div>
+          <div class="analytics-card">
+            <div class="icon">🌾</div>
+            <div class="value" id="stat-farmers">0</div>
+            <div class="label">Farmers</div>
+          </div>
+          <div class="analytics-card">
+            <div class="icon">🛒</div>
+            <div class="value" id="stat-consumers">0</div>
+            <div class="label">Consumers</div>
+          </div>
+          <div class="analytics-card">
+            <div class="icon">💰</div>
+            <div class="value" id="stat-investors">0</div>
+            <div class="label">Investors</div>
+          </div>
+          <div class="analytics-card">
+            <div class="icon">🩺</div>
+            <div class="value" id="stat-vets">0</div>
+            <div class="label">Veterinarians</div>
+          </div>
+          <div class="analytics-card">
+            <div class="icon">⏳</div>
+            <div class="value" id="stat-pending">0</div>
+            <div class="label">Pending Verification</div>
+          </div>
+          <div class="analytics-card">
+            <div class="icon">✅</div>
+            <div class="value" id="stat-verified">0</div>
+            <div class="label">Verified Users</div>
+          </div>
+          <div class="analytics-card">
+            <div class="icon">❓</div>
+            <div class="value" id="stat-questions">0</div>
+            <div class="label">Vet Questions</div>
+          </div>
+          <div class="analytics-card">
+            <div class="icon">🚫</div>
+            <div class="value" id="stat-suspended">0</div>
+            <div class="label">Suspended Users</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users -->
+      <div id="section-users" class="admin-section">
+        <div class="dash-card">
+          <h3>👥 All Users</h3>
+          <div class="filter-row">
+            <input
+              class="search-bar"
+              style="flex: 1; margin: 0"
+              id="user-search"
+              placeholder="Search by name or email..."
+              oninput="filterUsers()"
+            />
+            <select id="role-filter" onchange="filterUsers()">
+              <option value="">All Roles</option>
+              <option value="farmer">Farmers</option>
+              <option value="consumer">Consumers</option>
+              <option value="investor">Investors</option>
+              <option value="vet">Vets</option>
+            </select>
+            <select id="status-filter" onchange="filterUsers()">
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="verified">Verified</option>
+              <option value="rejected">Rejected</option>
+              <option value="suspended">Suspended</option>
+            </select>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Joined</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Produce -->
+      <div id="section-produce" class="admin-section">
+        <div class="dash-card">
+          <h3>🌾 All Produce Listings</h3>
+          <input
+            class="search-bar"
+            id="produce-search"
+            placeholder="Search produce..."
+            oninput="filterProduce()"
+          />
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Qty</th>
+                  <th>Location</th>
+                  <th>Farmer</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="produce-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders -->
+      <div id="section-orders" class="admin-section">
+        <div class="dash-card">
+          <h3>📦 All Orders</h3>
+          <div class="filter-row">
+            <select id="order-status-filter" onchange="filterOrders()">
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Produce</th>
+                  <th>Buyer</th>
+                  <th>Farmer</th>
+                  <th>Qty</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Investments -->
+      <div id="section-investments" class="admin-section">
+        <div class="dash-card">
+          <h3>💰 All Investments</h3>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Investor</th>
+                  <th>Crop</th>
+                  <th>Amount</th>
+                  <th>Expected Return</th>
+                  <th>Tenor</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="investments-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vet Questions -->
+      <div id="section-vet-questions" class="admin-section">
+        <div class="dash-card">
+          <h3>🩺 All Vet Questions</h3>
+          <div class="filter-row">
+            <select id="question-status-filter" onchange="filterQuestions()">
+              <option value="">All Status</option>
+              <option value="open">Open</option>
+              <option value="answered">Answered</option>
+            </select>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Question</th>
+                  <th>Asked By</th>
+                  <th>Answer</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="questions-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      if (!token || role !== "admin") window.location.href = "/login";
+
+      let allUsers = [],
+        allProduce = [],
+        allOrders = [],
+        allInvestments = [],
+        allQuestions = [];
+
+      function showSection(name) {
+        document
+          .querySelectorAll(".admin-section")
+          .forEach((s) => s.classList.remove("active"));
+        document
+          .querySelectorAll(".admin-nav-btn")
+          .forEach((b) => b.classList.remove("active"));
+        document.getElementById(`section-${name}`).classList.add("active");
+        event.target.classList.add("active");
+      }
+
+      function logout() {
+        localStorage.clear();
+        window.location.href = "/";
+      }
+
+      async function api(url, options = {}) {
+        return fetch(url, {
+          ...options,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            ...(options.headers || {}),
+          },
+        });
+      }
+
+      async function loadProfile() {
+        const res = await api("/auth/me");
+        const user = await res.json();
+        document.getElementById("admin-name").textContent = user.full_name;
+      }
+
+      async function loadAnalytics() {
+        const res = await api("/admin/analytics");
+        const data = await res.json();
+        document.getElementById("stat-users").textContent = data.total_users;
+        document.getElementById("stat-produce").textContent =
+          data.total_produce;
+        document.getElementById("stat-orders").textContent = data.total_orders;
+        document.getElementById("stat-investments").textContent =
+          `₦${(data.total_invested || 0).toLocaleString()}`;
+        document.getElementById("stat-farmers").textContent = data.farmers;
+        document.getElementById("stat-consumers").textContent = data.consumers;
+        document.getElementById("stat-investors").textContent = data.investors;
+        document.getElementById("stat-vets").textContent = data.vets;
+        document.getElementById("stat-pending").textContent =
+          data.pending_verification;
+        document.getElementById("stat-verified").textContent =
+          data.verified_users;
+        document.getElementById("stat-questions").textContent =
+          data.total_questions;
+        document.getElementById("stat-suspended").textContent =
+          data.suspended_users;
+      }
+
+      async function loadUsers() {
+        const res = await api("/admin/users");
+        allUsers = await res.json();
+        renderUsers(allUsers);
+      }
+
+      function renderUsers(users) {
+        const tbody = document.getElementById("users-table");
+        if (!users.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="8" class="empty-state">No users found</td></tr>';
+          return;
+        }
+        tbody.innerHTML = users
+          .map(
+            (u) => `
+        <tr>
+          <td>${u.id}</td>
+          <td><strong>${u.full_name}</strong></td>
+          <td>${u.email}</td>
+          <td>${u.phone}</td>
+          <td><span class="role-badge ${u.role}-badge">${u.role}</span></td>
+          <td><span class="status-badge status-${u.verification_status}">${u.verification_status}</span></td>
+          <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : "N/A"}</td>
+          <td>
+            ${u.verification_status === "pending" ? `<button class="action-btn btn-verify" onclick="verifyUser(${u.id})">✅ Verify</button>` : ""}
+            ${u.verification_status === "pending" ? `<button class="action-btn btn-reject" onclick="rejectUser(${u.id})">❌ Reject</button>` : ""}
+            ${u.verification_status !== "suspended" ? `<button class="action-btn btn-suspend" onclick="suspendUser(${u.id})">🚫 Suspend</button>` : `<button class="action-btn btn-verify" onclick="verifyUser(${u.id})">♻️ Restore</button>`}
+            <button class="action-btn btn-delete" onclick="deleteUser(${u.id}, '${u.full_name}')">🗑 Delete</button>
+          </td>
+        </tr>
+      `,
+          )
+          .join("");
+      }
+
+      function filterUsers() {
+        const query = document
+          .getElementById("user-search")
+          .value.toLowerCase();
+        const role = document.getElementById("role-filter").value;
+        const status = document.getElementById("status-filter").value;
+        const filtered = allUsers.filter(
+          (u) =>
+            (!query ||
+              u.full_name.toLowerCase().includes(query) ||
+              u.email.toLowerCase().includes(query)) &&
+            (!role || u.role === role) &&
+            (!status || u.verification_status === status),
+        );
+        renderUsers(filtered);
+      }
+
+      async function verifyUser(id) {
+        await api(`/admin/verify-user/${id}`, { method: "PUT" });
+        loadUsers();
+        loadAnalytics();
+      }
+
+      async function rejectUser(id) {
+        await api(`/admin/reject-user/${id}`, { method: "PUT" });
+        loadUsers();
+        loadAnalytics();
+      }
+
+      async function suspendUser(id) {
+        if (!confirm("Suspend this user?")) return;
+        await api(`/admin/suspend-user/${id}`, { method: "PUT" });
+        loadUsers();
+        loadAnalytics();
+      }
+
+      async function deleteUser(id, name) {
+        if (!confirm(`Permanently delete ${name}? This cannot be undone.`))
+          return;
+        await api(`/admin/delete-user/${id}`, { method: "DELETE" });
+        loadUsers();
+        loadAnalytics();
+      }
+
+      async function loadProduce() {
+        const res = await api("/admin/produce");
+        allProduce = await res.json();
+        renderProduce(allProduce);
+      }
+
+      function renderProduce(produce) {
+        const tbody = document.getElementById("produce-table");
+        if (!produce.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="9" class="empty-state">No produce found</td></tr>';
+          return;
+        }
+        tbody.innerHTML = produce
+          .map(
+            (p) => `
+        <tr>
+          <td>${p.id}</td>
+          <td>${p.title}</td>
+          <td>${p.category}</td>
+          <td>₦${p.price.toLocaleString()}</td>
+          <td>${p.quantity}</td>
+          <td>${p.location}</td>
+          <td>${p.farmer_name}</td>
+          <td><span class="status-badge ${p.is_available ? "status-active" : "status-cancelled"}">${p.is_available ? "Active" : "Removed"}</span></td>
+          <td>
+            ${p.is_available ? `<button class="action-btn btn-suspend" onclick="removeProduce(${p.id})">Remove</button>` : ""}
+          </td>
+        </tr>
+      `,
+          )
+          .join("");
+      }
+
+      function filterProduce() {
+        const query = document
+          .getElementById("produce-search")
+          .value.toLowerCase();
+        renderProduce(
+          allProduce.filter(
+            (p) =>
+              p.title.toLowerCase().includes(query) ||
+              p.category.toLowerCase().includes(query),
+          ),
+        );
+      }
+
+      async function removeProduce(id) {
+        if (!confirm("Remove this listing?")) return;
+        await api(`/admin/remove-produce/${id}`, { method: "PUT" });
+        loadProduce();
+      }
+
+      async function loadOrders() {
+        const res = await api("/admin/orders");
+        allOrders = await res.json();
+        renderOrders(allOrders);
+      }
+
+      function renderOrders(orders) {
+        const tbody = document.getElementById("orders-table");
+        if (!orders.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="8" class="empty-state">No orders found</td></tr>';
+          return;
+        }
+        tbody.innerHTML = orders
+          .map(
+            (o) => `
+        <tr>
+          <td>${o.id}</td>
+          <td>${o.produce_title}</td>
+          <td>${o.buyer_name}</td>
+          <td>${o.farmer_name}</td>
+          <td>${o.quantity}</td>
+          <td>₦${o.total_price.toLocaleString()}</td>
+          <td><span class="status-badge status-${o.status}">${o.status}</span></td>
+          <td>${new Date(o.created_at).toLocaleDateString()}</td>
+        </tr>
+      `,
+          )
+          .join("");
+      }
+
+      function filterOrders() {
+        const status = document.getElementById("order-status-filter").value;
+        renderOrders(allOrders.filter((o) => !status || o.status === status));
+      }
+
+      async function loadInvestments() {
+        const res = await api("/admin/investments");
+        allInvestments = await res.json();
+        renderInvestments(allInvestments);
+      }
+
+      function renderInvestments(investments) {
+        const tbody = document.getElementById("investments-table");
+        if (!investments.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="8" class="empty-state">No investments found</td></tr>';
+          return;
+        }
+        tbody.innerHTML = investments
+          .map(
+            (i) => `
+        <tr>
+          <td>${i.id}</td>
+          <td>${i.investor_name}</td>
+          <td>${i.crop}</td>
+          <td>₦${i.amount.toLocaleString()}</td>
+          <td>₦${((i.amount || 0) + (i.expected_return || 0)).toLocaleString()}</td>
+          <td>${i.tenor}</td>
+          <td><span class="status-badge status-${i.status}">${i.status}</span></td>
+          <td>${new Date(i.created_at).toLocaleDateString()}</td>
+        </tr>
+      `,
+          )
+          .join("");
+      }
+
+      async function loadQuestions() {
+        const res = await api("/admin/vet-questions");
+        allQuestions = await res.json();
+        renderQuestions(allQuestions);
+      }
+
+      function renderQuestions(questions) {
+        const tbody = document.getElementById("questions-table");
+        if (!questions.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="6" class="empty-state">No questions found</td></tr>';
+          return;
+        }
+        tbody.innerHTML = questions
+          .map(
+            (q) => `
+        <tr>
+          <td>${q.id}</td>
+          <td style="max-width:250px">${q.question}</td>
+          <td>${q.user_name}</td>
+          <td style="max-width:250px; color:#065f46">${q.answer || '<span style="color:#9ca3af">Not answered</span>'}</td>
+          <td><span class="status-badge status-${q.status}">${q.status}</span></td>
+          <td>${new Date(q.created_at).toLocaleDateString()}</td>
+        </tr>
+      `,
+          )
+          .join("");
+      }
+
+      function filterQuestions() {
+        const status = document.getElementById("question-status-filter").value;
+        renderQuestions(
+          allQuestions.filter((q) => !status || q.status === status),
+        );
+      }
+
+      // Load all data
+      loadProfile();
+      loadAnalytics();
+      loadUsers();
+      loadProduce();
+      loadOrders();
+      loadInvestments();
+      loadQuestions();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriNet — Equipment & Machinery</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+  </head>
+  <body class="bg-gradient">
+    <header class="header container">
+      <a
+        href="/"
+        style="
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 1.25rem;
+          color: #065f46;
+        "
+        >🌿 AgriNet</a
+      >
+      <div style="display: flex; align-items: center; gap: 0.75rem">
+        <a
+          href="/farmland-listing"
+          style="
+            color: #065f46;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+          "
+          >🌱 Farmland</a
+        >
+        <a
+          href="/cold-room-booking"
+          style="
+            color: #065f46;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+          "
+          >❄️ Cold Rooms</a
+        >
+        <button onclick="window.history.back()" class="btn-logout">
+          ← Back
+        </button>
+      </div>
+    </header>
+
+    <div class="dash-container">
+      <div class="dash-card">
+        <h3>🚜 Equipment & Machinery</h3>
+        <div
+          style="
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+          "
+        >
+          <select
+            id="state-filter"
+            onchange="loadEquipment()"
+            style="
+              padding: 0.5rem;
+              border-radius: 0.5rem;
+              border: 1px solid #d1d5db;
+            "
+          >
+            <option value="">All States</option>
+            <option>Lagos</option>
+            <option>Kano</option>
+            <option>FCT Abuja</option>
+            <option>Rivers</option>
+            <option>Oyo</option>
+            <option>Kaduna</option>
+            <option>Enugu</option>
+            <option>Edo</option>
+            <option>Delta</option>
+            <option>Benue</option>
+            <option>Plateau</option>
+            <option>Nasarawa</option>
+          </select>
+          <select
+            id="type-filter"
+            onchange="loadEquipment()"
+            style="
+              padding: 0.5rem;
+              border-radius: 0.5rem;
+              border: 1px solid #d1d5db;
+            "
+          >
+            <option value="">For Sale & Rent</option>
+            <option value="sale">For Sale</option>
+            <option value="rent">For Rent</option>
+          </select>
+        </div>
+        <div id="equipment-list" class="product-grid"></div>
+      </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div
+      id="booking-modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        style="
+          background: white;
+          border-radius: 1.5rem;
+          padding: 2rem;
+          max-width: 420px;
+          width: 90%;
+          margin: auto;
+        "
+      >
+        <h3 id="modal-title" style="color: #065f46"></h3>
+        <p id="modal-info" style="color: #6b7280; font-size: 0.9rem"></p>
+        <div id="booking-msg" class="msg" style="display: none"></div>
+        <div id="date-fields" style="display: none">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Start Date</label>
+              <input type="date" id="start-date" oninput="calcCost()" />
+            </div>
+            <div class="form-group">
+              <label>End Date</label>
+              <input type="date" id="end-date" oninput="calcCost()" />
+            </div>
+          </div>
+        </div>
+        <div
+          id="cost-summary"
+          style="
+            background: #f0fdf4;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+          "
+        >
+          <p
+            style="
+              margin: 0;
+              font-weight: 700;
+              color: #065f46;
+              font-size: 1.1rem;
+            "
+            id="cost-text"
+          ></p>
+        </div>
+        <div style="display: flex; gap: 0.5rem">
+          <button class="submit-btn" onclick="submitBooking()">
+            Confirm Booking
+          </button>
+          <button
+            onclick="closeModal()"
+            style="
+              flex: 1;
+              padding: 0.75rem;
+              background: #f3f4f6;
+              border: none;
+              border-radius: 0.75rem;
+              cursor: pointer;
+              font-weight: 600;
+            "
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      const name = localStorage.getItem("name");
+      if (token && !["farmer", "consumer"].includes(role)) {
+        const routes = {
+          vendor: "/vendor-dashboard",
+          vet: "/vet-dashboard",
+          investor: "/investor-dashboard",
+          admin: "/admin-dashboard",
+        };
+        alert("This section is for farmers and consumers only.");
+        window.location.href = routes[role] || "/";
+      }
+      let selectedEquipment = null;
+
+      async function loadEquipment() {
+        const state = document.getElementById("state-filter").value;
+        const type = document.getElementById("type-filter").value;
+        let url = "/equipment?";
+        if (state) url += `state=${encodeURIComponent(state)}&`;
+        if (type) url += `listing_type=${type}`;
+        const res = await fetch(url);
+        const items = await res.json();
+        const container = document.getElementById("equipment-list");
+        if (!items.length) {
+          container.innerHTML =
+            '<p style="color:#6b7280">No equipment found. Check back soon!</p>';
+          return;
+        }
+        container.innerHTML = items
+          .map(
+            (e) => `
+        <div class="product-card">
+          <div class="product-photo" style="${e.image_path ? `background-image:url('${e.image_path}')` : "background:#f0fdf4; display:flex; align-items:center; justify-content:center; font-size:2.5rem"}">
+            ${!e.image_path ? "🚜" : ""}
+          </div>
+          <div class="product-body">
+            <span class="verified-badge" style="background:${e.listing_type === "rent" ? "#dbeafe" : "#d1fae5"}; color:${e.listing_type === "rent" ? "#1e40af" : "#065f46"}">
+              ${e.listing_type === "rent" ? "🔄 For Rent" : "💰 For Sale"}
+            </span>
+            <h4>${e.title}</h4>
+            <p class="product-meta">📍 ${e.location}, ${e.state}</p>
+            <p class="product-meta">Condition: ${e.condition}</p>
+            ${e.description ? `<p class="product-meta" style="font-size:0.8rem">${e.description}</p>` : ""}
+            <p class="product-price">₦${e.price.toLocaleString()}${e.rent_period ? "/" + e.rent_period : ""}</p>
+            <p class="product-meta">Vendor: ${e.vendor_name}</p>
+            <div class="product-buttons">
+              <button class="submit-btn" style="flex:1" onclick='openModal(${JSON.stringify(e).replace(/'/g, "&apos;")})'>
+                ${e.listing_type === "rent" ? "Book Now" : "Contact Seller"}
+              </button>
+            </div>
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      function openModal(equipment) {
+        if (!token) {
+          window.location.href = "/login";
+          return;
+        }
+        selectedEquipment = equipment;
+        document.getElementById("modal-title").textContent = equipment.title;
+        document.getElementById("modal-info").textContent =
+          `${equipment.location}, ${equipment.state} • ${equipment.condition}`;
+        document.getElementById("booking-msg").style.display = "none";
+        const dateFields = document.getElementById("date-fields");
+        const costText = document.getElementById("cost-text");
+        if (equipment.listing_type === "rent") {
+          dateFields.style.display = "block";
+          const today = new Date().toISOString().split("T")[0];
+          document.getElementById("start-date").min = today;
+          document.getElementById("end-date").min = today;
+          document.getElementById("start-date").value = "";
+          document.getElementById("end-date").value = "";
+          costText.textContent = `₦${equipment.price.toLocaleString()} per ${equipment.rent_period}`;
+        } else {
+          dateFields.style.display = "none";
+          costText.textContent = `Purchase Price: ₦${equipment.price.toLocaleString()}`;
+        }
+        document.getElementById("booking-modal").style.display = "flex";
+      }
+
+      function calcCost() {
+        if (!selectedEquipment) return;
+        const start = document.getElementById("start-date").value;
+        const end = document.getElementById("end-date").value;
+        if (!start || !end) return;
+        const days = Math.max(
+          1,
+          Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)),
+        );
+        const total = days * selectedEquipment.price;
+        document.getElementById("cost-text").textContent =
+          `${days} day(s) × ₦${selectedEquipment.price.toLocaleString()} = ₦${total.toLocaleString()}`;
+      }
+
+      function closeModal() {
+        document.getElementById("booking-modal").style.display = "none";
+      }
+
+      async function submitBooking() {
+        if (!token) {
+          window.location.href = "/login";
+          return;
+        }
+        const body = { equipment_id: selectedEquipment.id };
+        if (selectedEquipment.listing_type === "rent") {
+          body.start_date = document.getElementById("start-date").value;
+          body.end_date = document.getElementById("end-date").value;
+          if (!body.start_date || !body.end_date) {
+            const msg = document.getElementById("booking-msg");
+            msg.style.display = "block";
+            msg.className = "msg error";
+            msg.textContent = "Please select start and end dates";
+            return;
+          }
+        }
+        const res = await fetch("/equipment/book", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        const msg = document.getElementById("booking-msg");
+        msg.style.display = "block";
+        if (res.ok) {
+          msg.className = "msg success";
+          msg.textContent = `${data.message} Total: ₦${data.total_cost.toLocaleString()}. Vendor will contact you.`;
+          setTimeout(closeModal, 3000);
+        } else {
+          msg.className = "msg error";
+          msg.textContent = data.detail || "Booking failed";
+        }
+      }
+
+      loadEquipment();
+    </script>
+  </body>
+</html>

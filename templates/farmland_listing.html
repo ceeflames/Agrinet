@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriNet — Farmland for Rent</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+  </head>
+  <body class="bg-gradient">
+    <header class="header container">
+      <a
+        href="/"
+        style="
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 1.25rem;
+          color: #065f46;
+        "
+        >🌿 AgriNet</a
+      >
+      <div style="display: flex; align-items: center; gap: 0.75rem">
+        <a
+          href="/equipment-listing"
+          style="
+            color: #065f46;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+          "
+          >🚜 Equipment</a
+        >
+        <a
+          href="/cold-room-booking"
+          style="
+            color: #065f46;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+          "
+          >❄️ Cold Rooms</a
+        >
+        <button onclick="window.history.back()" class="btn-logout">
+          ← Back
+        </button>
+      </div>
+    </header>
+
+    <div class="dash-container">
+      <div class="dash-card">
+        <h3>🌱 Farmland for Rent</h3>
+        <div
+          style="
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+          "
+        >
+          <select
+            id="state-filter"
+            onchange="loadFarmland()"
+            style="
+              padding: 0.5rem;
+              border-radius: 0.5rem;
+              border: 1px solid #d1d5db;
+            "
+          >
+            <option value="">All States</option>
+            <option>Lagos</option>
+            <option>Kano</option>
+            <option>FCT Abuja</option>
+            <option>Rivers</option>
+            <option>Oyo</option>
+            <option>Kaduna</option>
+            <option>Enugu</option>
+            <option>Edo</option>
+            <option>Delta</option>
+            <option>Benue</option>
+            <option>Plateau</option>
+            <option>Nasarawa</option>
+            <option>Niger State</option>
+            <option>Kebbi</option>
+            <option>Sokoto</option>
+            <option>Katsina</option>
+            <option>Jigawa</option>
+            <option>Bauchi</option>
+            <option>Adamawa</option>
+            <option>Taraba</option>
+            <option>Borno</option>
+          </select>
+        </div>
+        <div id="farmland-list" class="product-grid"></div>
+      </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div
+      id="booking-modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        style="
+          background: white;
+          border-radius: 1.5rem;
+          padding: 2rem;
+          max-width: 480px;
+          width: 90%;
+          margin: auto;
+        "
+      >
+        <h3 id="modal-title" style="color: #065f46"></h3>
+        <div
+          id="modal-details"
+          style="
+            background: #f0fdf4;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+          "
+        ></div>
+        <div id="booking-msg" class="msg" style="display: none"></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Start Date</label>
+            <input type="date" id="start-date" />
+          </div>
+          <div class="form-group">
+            <label>End Date</label>
+            <input type="date" id="end-date" />
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem">
+          <button class="submit-btn" onclick="submitBooking()">
+            Request Booking
+          </button>
+          <button
+            onclick="closeModal()"
+            style="
+              flex: 1;
+              padding: 0.75rem;
+              background: #f3f4f6;
+              border: none;
+              border-radius: 0.75rem;
+              cursor: pointer;
+              font-weight: 600;
+            "
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      const name = localStorage.getItem("name");
+      if (token && !["farmer", "consumer"].includes(role)) {
+        const routes = {
+          vendor: "/vendor-dashboard",
+          vet: "/vet-dashboard",
+          investor: "/investor-dashboard",
+          admin: "/admin-dashboard",
+        };
+        alert("This section is for farmers and consumers only.");
+        window.location.href = routes[role] || "/";
+      }
+      let selectedLand = null;
+
+      async function loadFarmland() {
+        const state = document.getElementById("state-filter").value;
+        const url = state
+          ? `/farmland?state=${encodeURIComponent(state)}`
+          : "/farmland";
+        const res = await fetch(url);
+        const items = await res.json();
+        const container = document.getElementById("farmland-list");
+        if (!items.length) {
+          container.innerHTML =
+            '<p style="color:#6b7280">No farmland listings yet. Check back soon!</p>';
+          return;
+        }
+        container.innerHTML = items
+          .map(
+            (l) => `
+        <div class="product-card">
+          <div class="product-photo" style="${l.image_path ? `background-image:url('${l.image_path}')` : "background:linear-gradient(135deg,#d1fae5,#a7f3d0); display:flex; align-items:center; justify-content:center; font-size:2.5rem"}">
+            ${!l.image_path ? "🌱" : ""}
+          </div>
+          <div class="product-body">
+            <span class="verified-badge">🌱 Farmland</span>
+            <h4>${l.title}</h4>
+            <p class="product-meta">📍 ${l.location}, ${l.state}</p>
+            ${l.address ? `<p class="product-meta" style="font-size:0.8rem">${l.address}</p>` : ""}
+            <p class="product-meta">📐 ${l.size_hectares} hectares</p>
+            ${l.soil_type ? `<p class="product-meta">🪨 Soil: ${l.soil_type}</p>` : ""}
+            ${l.water_source ? `<p class="product-meta">💧 Water: ${l.water_source}</p>` : ""}
+            ${l.description ? `<p class="product-meta" style="font-size:0.8rem">${l.description}</p>` : ""}
+            <p class="product-price">₦${l.price_per_season.toLocaleString()}/${l.rent_period}</p>
+            <p class="product-meta">Owner: ${l.vendor_name}</p>
+            ${l.lat && l.lng ? `<a href="https://maps.google.com/?q=${l.lat},${l.lng}" target="_blank" style="font-size:0.8rem; color:#10b981; text-decoration:none">📍 View on Map</a>` : ""}
+            <div class="product-buttons" style="margin-top:0.75rem">
+              <button class="submit-btn" style="flex:1" onclick='openModal(${JSON.stringify(l).replace(/'/g, "&apos;")})'>Request Land</button>
+            </div>
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      function openModal(land) {
+        if (!token) {
+          window.location.href = "/login";
+          return;
+        }
+        selectedLand = land;
+        document.getElementById("modal-title").textContent = land.title;
+        document.getElementById("modal-details").innerHTML = `
+        <p style="margin:0"><strong>📍</strong> ${land.location}, ${land.state}</p>
+        <p style="margin:0.25rem 0"><strong>📐</strong> ${land.size_hectares} hectares</p>
+        <p style="margin:0.25rem 0"><strong>💰</strong> ₦${land.price_per_season.toLocaleString()} per ${land.rent_period}</p>
+      `;
+        document.getElementById("booking-msg").style.display = "none";
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById("start-date").min = today;
+        document.getElementById("end-date").min = today;
+        document.getElementById("booking-modal").style.display = "flex";
+      }
+
+      function closeModal() {
+        document.getElementById("booking-modal").style.display = "none";
+      }
+
+      async function submitBooking() {
+        const startDate = document.getElementById("start-date").value;
+        const endDate = document.getElementById("end-date").value;
+        if (!startDate || !endDate) {
+          const msg = document.getElementById("booking-msg");
+          msg.style.display = "block";
+          msg.className = "msg error";
+          msg.textContent = "Please select start and end dates";
+          return;
+        }
+        const res = await fetch("/farmland/book", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            farmland_id: selectedLand.id,
+            start_date: startDate,
+            end_date: endDate,
+          }),
+        });
+        const data = await res.json();
+        const msg = document.getElementById("booking-msg");
+        msg.style.display = "block";
+        if (res.ok) {
+          msg.className = "msg success";
+          msg.textContent = `${data.message} Total: ₦${data.total_cost.toLocaleString()}. The owner will contact you.`;
+          setTimeout(closeModal, 3000);
+        } else {
+          msg.className = "msg error";
+          msg.textContent = data.detail || "Booking failed";
+        }
+      }
+
+      loadFarmland();
+    </script>
+  </body>
+</html>

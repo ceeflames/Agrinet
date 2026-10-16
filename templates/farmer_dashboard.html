@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriNet — Farmer Dashboard</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+  </head>
+  <body class="bg-gradient">
+    <header class="header container">
+      <a
+        href="/"
+        style="
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 1.25rem;
+          color: #065f46;
+        "
+        >🌿 AgriNet</a
+      >
+      <div style="display: flex; align-items: center; gap: 0.75rem">
+        <span id="user-name" style="font-weight: 600; color: #065f46"></span>
+        <span class="role-badge farmer-badge">🌾 Farmer</span>
+        <button
+          onclick="window.location.href = '/wallet'"
+          style="
+            padding: 0.4rem 0.9rem;
+            border-radius: 0.5rem;
+            border: none;
+            background: #065f46;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+          "
+        >
+          💰 My Wallet
+        </button>
+        <button class="btn-logout" onclick="logout()">Log Out</button>
+      </div>
+    </header>
+
+    <div class="dash-container">
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-info">
+            <div class="stat-value" id="total-listings">0</div>
+            <div class="stat-label">Active Listings</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🛒</div>
+          <div class="stat-info">
+            <div class="stat-value" id="total-orders">0</div>
+            <div class="stat-label">Orders Received</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <div class="stat-value" id="total-earnings">₦0</div>
+            <div class="stat-label">Total Earnings</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🔖</div>
+          <div class="stat-info">
+            <div class="stat-value" id="verification-status">Pending</div>
+            <div class="stat-label">Verification</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Tabs -->
+      <div class="dash-tabs">
+        <button class="dash-tab active" onclick="showTab('produce')">
+          🌾 My Produce
+        </button>
+        <button class="dash-tab" onclick="showTab('orders')">
+          🛒 Orders
+          <span
+            id="orders-badge"
+            style="
+              background: #ef4444;
+              color: white;
+              border-radius: 9999px;
+              padding: 0.1rem 0.4rem;
+              font-size: 0.7rem;
+              display: none;
+            "
+            >!</span
+          >
+        </button>
+        <button class="dash-tab" onclick="showTab('notifications')">
+          🔔 Alerts
+          <span
+            id="notif-badge"
+            style="
+              background: #ef4444;
+              color: white;
+              border-radius: 9999px;
+              padding: 0.1rem 0.4rem;
+              font-size: 0.7rem;
+              display: none;
+            "
+            >!</span
+          >
+        </button>
+        <button
+          class="dash-tab"
+          onclick="window.location.href = '/cold-room-booking'"
+        >
+          ❄️ Cold Rooms
+        </button>
+        <button class="dash-tab" onclick="showTab('location')">
+          📍 Farm Location
+        </button>
+        <button class="dash-tab" onclick="showTab('weather')">
+          🌤 Weather
+        </button>
+        <button class="dash-tab" onclick="showTab('vet')">🩺 Ask Vet</button>
+      </div>
+
+      <!-- My Produce Tab -->
+      <div id="tab-produce" class="dash-tab-content active">
+        <div class="dash-card">
+          <h3>➕ List New Produce</h3>
+          <div id="produce-msg" class="msg" style="display: none"></div>
+          <form id="produce-form" enctype="multipart/form-data">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Produce Title</label>
+                <input
+                  type="text"
+                  name="title"
+                  placeholder="e.g. Maize (100kg bags)"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Category</label>
+                <select name="category" required>
+                  <option value="">Select category</option>
+                  <option value="grains">Grains</option>
+                  <option value="vegetables">Vegetables</option>
+                  <option value="fruits">Fruits</option>
+                  <option value="livestock">Livestock</option>
+                  <option value="dairy">Dairy</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Price (₦)</label>
+                <input
+                  type="number"
+                  name="price"
+                  placeholder="e.g. 43000"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Unit</label>
+                <select name="unit" required>
+                  <option value="">Select unit</option>
+                  <option value="bag">Bag</option>
+                  <option value="crate">Crate</option>
+                  <option value="kg">Kg</option>
+                  <option value="litre">Litre</option>
+                  <option value="piece">Piece</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Quantity Available</label>
+                <input
+                  type="number"
+                  name="quantity"
+                  placeholder="e.g. 50"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label>Location</label>
+                <input
+                  type="text"
+                  name="location"
+                  placeholder="e.g. Kaduna"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Description (optional)</label>
+              <textarea
+                name="description"
+                placeholder="Describe your produce..."
+              ></textarea>
+            </div>
+            <div class="form-group">
+              <label>Produce Photo</label>
+              <input type="file" name="image" accept="image/*" />
+            </div>
+            <button type="submit" class="submit-btn" id="produce-btn">
+              List Produce
+            </button>
+          </form>
+        </div>
+
+        <div class="dash-card">
+          <h3>📦 My Listings</h3>
+          <div id="my-produce" class="product-grid"></div>
+        </div>
+      </div>
+
+      <!-- Orders Tab -->
+      <div id="tab-orders" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>🛒 Orders Received</h3>
+          <div
+            style="
+              background: #f0fdf4;
+              border-radius: 0.75rem;
+              padding: 0.75rem;
+              margin-bottom: 1rem;
+              font-size: 0.85rem;
+              color: #065f46;
+            "
+          >
+            💡 Orders paid by buyers will show a
+            <strong>Ship Now</strong> button. Mark as shipped once dispatched.
+          </div>
+          <div id="orders-list"></div>
+        </div>
+      </div>
+
+      <!-- Notifications Tab -->
+      <div id="tab-notifications" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>🔔 Notifications</h3>
+          <div
+            style="
+              display: flex;
+              justify-content: flex-end;
+              margin-bottom: 1rem;
+            "
+          >
+            <button
+              onclick="markAllRead()"
+              style="
+                padding: 0.3rem 0.75rem;
+                background: #f3f4f6;
+                border: none;
+                border-radius: 0.5rem;
+                cursor: pointer;
+                font-size: 0.85rem;
+              "
+            >
+              Mark all as read
+            </button>
+          </div>
+          <div id="notifications-list"></div>
+        </div>
+      </div>
+
+      <!-- Farm Location Tab -->
+      <div id="tab-location" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>📍 Upload Farm Location</h3>
+          <div id="location-msg" class="msg" style="display: none"></div>
+          <form id="location-form">
+            <div class="form-group">
+              <label>Farm Address / Description</label>
+              <input
+                type="text"
+                name="farm_location"
+                placeholder="e.g. Along Kaduna-Zaria Road, Kaduna State"
+                required
+              />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Latitude (optional)</label>
+                <input
+                  type="number"
+                  name="farm_lat"
+                  step="any"
+                  placeholder="e.g. 10.5222"
+                />
+              </div>
+              <div class="form-group">
+                <label>Longitude (optional)</label>
+                <input
+                  type="number"
+                  name="farm_lng"
+                  step="any"
+                  placeholder="e.g. 7.4383"
+                />
+              </div>
+            </div>
+            <button
+              type="button"
+              class="submit-btn"
+              style="background: #065f46; margin-bottom: 0.5rem"
+              onclick="getMyLocation()"
+            >
+              📌 Use My Current Location
+            </button>
+            <button type="submit" class="submit-btn">Save Farm Location</button>
+          </form>
+          <div
+            id="current-location"
+            style="margin-top: 1rem; color: #065f46; font-size: 0.9rem"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Weather Tab -->
+      <div id="tab-weather" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>🌤 Weather Forecast</h3>
+          <select
+            id="weather-city"
+            onchange="loadWeather(this.value)"
+            style="
+              width: 100%;
+              padding: 0.5rem;
+              border-radius: 0.5rem;
+              border: 1px solid #d1d5db;
+              margin-bottom: 1rem;
+            "
+          >
+            <option value="Abia">Abia</option>
+            <option value="Adamawa">Adamawa</option>
+            <option value="Akwa Ibom">Akwa Ibom</option>
+            <option value="Anambra">Anambra</option>
+            <option value="Bauchi">Bauchi</option>
+            <option value="Bayelsa">Bayelsa</option>
+            <option value="Benue">Benue</option>
+            <option value="Borno">Borno</option>
+            <option value="Cross River">Cross River</option>
+            <option value="Delta">Delta</option>
+            <option value="Ebonyi">Ebonyi</option>
+            <option value="Edo">Edo</option>
+            <option value="Ekiti">Ekiti</option>
+            <option value="Enugu">Enugu</option>
+            <option value="Abuja">FCT Abuja</option>
+            <option value="Gombe">Gombe</option>
+            <option value="Imo">Imo</option>
+            <option value="Jigawa">Jigawa</option>
+            <option value="Kaduna">Kaduna</option>
+            <option value="Kano">Kano</option>
+            <option value="Katsina">Katsina</option>
+            <option value="Kebbi">Kebbi</option>
+            <option value="Kogi">Kogi</option>
+            <option value="Kwara">Kwara</option>
+            <option value="Lagos">Lagos</option>
+            <option value="Nasarawa">Nasarawa</option>
+            <option value="Niger State">Niger State</option>
+            <option value="Ogun">Ogun</option>
+            <option value="Ondo">Ondo</option>
+            <option value="Osun">Osun</option>
+            <option value="Oyo">Oyo</option>
+            <option value="Plateau">Plateau</option>
+            <option value="Rivers">Rivers</option>
+            <option value="Sokoto">Sokoto</option>
+            <option value="Taraba">Taraba</option>
+            <option value="Yobe">Yobe</option>
+            <option value="Zamfara">Zamfara</option>
+          </select>
+          <div id="weather-forecast" class="forecast-container"></div>
+        </div>
+      </div>
+
+      <!-- Ask Vet Tab -->
+      <div id="tab-vet" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>🩺 Ask a Veterinarian</h3>
+          <div id="vet-msg" class="msg" style="display: none"></div>
+          <form id="vet-form">
+            <div class="form-group">
+              <label>Your Question</label>
+              <textarea
+                name="question"
+                placeholder="Describe your animal health or farming question..."
+                required
+                style="height: 120px"
+              ></textarea>
+            </div>
+            <button type="submit" class="submit-btn">Submit Question</button>
+          </form>
+        </div>
+        <div class="dash-card">
+          <h3>📋 My Questions</h3>
+          <div id="my-questions"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      if (!token) window.location.href = "/login";
+
+      function showTab(name) {
+        document
+          .querySelectorAll(".dash-tab")
+          .forEach((t) => t.classList.remove("active"));
+        document
+          .querySelectorAll(".dash-tab-content")
+          .forEach((t) => t.classList.remove("active"));
+        document.getElementById(`tab-${name}`).classList.add("active");
+        event.target.classList.add("active");
+      }
+
+      function logout() {
+        localStorage.clear();
+        window.location.href = "/";
+      }
+
+      async function api(url, options = {}) {
+        return fetch(url, {
+          ...options,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            ...(options.headers || {}),
+          },
+        });
+      }
+
+      async function loadProfile() {
+        const res = await api("/auth/me");
+        const user = await res.json();
+        document.getElementById("user-name").textContent = user.full_name;
+        document.getElementById("verification-status").textContent =
+          user.is_verified ? "Verified ✅" : "Pending ⏳";
+        if (user.farm_location) {
+          document.getElementById("current-location").textContent =
+            `Current: ${user.farm_location}`;
+        }
+      }
+
+      async function loadMyProduce() {
+        const res = await api("/farmer/my-produce");
+        const produce = await res.json();
+        document.getElementById("total-listings").textContent = produce.length;
+        const container = document.getElementById("my-produce");
+        if (!produce.length) {
+          container.innerHTML = '<p style="color:#6b7280">No listings yet.</p>';
+          return;
+        }
+        container.innerHTML = produce
+          .map(
+            (p) => `
+        <div class="product-card">
+          <div class="product-photo" style="${p.image_path ? `background-image:url('${p.image_path}')` : "background:#f3f4f6"}">
+            ${!p.image_path ? '<div class="no-photo">No photo</div>' : ""}
+          </div>
+          <div class="product-body">
+            <h4>${p.title}</h4>
+            <p class="product-meta">📍 ${p.location} • per ${p.unit}</p>
+            <p class="product-price">₦${p.price.toLocaleString()}</p>
+            <p class="product-meta">Qty: ${p.quantity}</p>
+            <div class="product-buttons">
+              <button class="contact-btn" style="background:#fee2e2;color:#991b1b" onclick="deleteProduce(${p.id})">Remove</button>
+            </div>
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      async function loadOrders() {
+        const res = await api("/farmer/orders");
+        const orders = await res.json();
+        document.getElementById("total-orders").textContent = orders.length;
+        const earnings = orders
+          .filter((o) => o.status === "delivered")
+          .reduce((sum, o) => sum + o.farmer_amount, 0);
+        document.getElementById("total-earnings").textContent =
+          `₦${earnings.toLocaleString()}`;
+        const container = document.getElementById("orders-list");
+
+        // Show badge for orders needing action
+        const actionNeeded = orders.filter(
+          (o) => o.payment_status === "paid" && o.status === "confirmed",
+        );
+        const badge = document.getElementById("orders-badge");
+        if (actionNeeded.length > 0) {
+          badge.style.display = "inline";
+          badge.textContent = actionNeeded.length;
+        } else {
+          badge.style.display = "none";
+        }
+
+        if (!orders.length) {
+          container.innerHTML = '<p style="color:#6b7280">No orders yet.</p>';
+          return;
+        }
+        container.innerHTML = orders
+          .map(
+            (o) => `
+        <div class="order-card" style="border-left: 4px solid ${o.payment_status === "paid" ? "#10b981" : "#f59e0b"}">
+          <div class="order-info">
+            <h4>${o.produce_title}</h4>
+            <p>Buyer: ${o.buyer_name} • Qty: ${o.quantity}</p>
+            <p style="font-weight:700; color:#065f46">₦${o.total_price.toLocaleString()} ${o.farmer_amount ? `(Your share: ₦${o.farmer_amount.toLocaleString()})` : ""}</p>
+            <p style="font-size:0.8rem; color:#6b7280">📍 Deliver to: ${o.delivery_address || "Not specified"}</p>
+            <p style="font-size:0.8rem; color:#6b7280">${new Date(o.created_at).toLocaleDateString()}</p>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:0.5rem; align-items:flex-end">
+            <span class="status-badge ${o.payment_status === "paid" ? "status-delivered" : "status-pending"}">${o.payment_status === "paid" ? "💰 Paid" : "⏳ Awaiting Payment"}</span>
+            <span class="status-badge status-${o.status}">${o.status}</span>
+            ${o.status === "pending" ? `<button class="submit-btn" style="padding:0.3rem 0.75rem; font-size:0.8rem" onclick="updateOrder(${o.id}, 'confirmed')">✅ Confirm Order</button>` : ""}
+            ${o.status === "confirmed" && o.payment_status === "paid" ? `<button class="submit-btn" style="padding:0.3rem 0.75rem; font-size:0.8rem; background:#065f46" onclick="updateOrder(${o.id}, 'shipped')">🚚 Ship Now</button>` : ""}
+            ${o.status === "confirmed" && o.payment_status !== "paid" ? `<p style="font-size:0.75rem; color:#f59e0b; font-weight:600">⚠️ Wait for payment before shipping</p>` : ""}
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      async function loadMyQuestions() {
+        const res = await api("/vet/my-questions");
+        const questions = await res.json();
+        const container = document.getElementById("my-questions");
+        if (!questions.length) {
+          container.innerHTML =
+            '<p style="color:#6b7280">No questions yet.</p>';
+          return;
+        }
+        container.innerHTML = questions
+          .map(
+            (q) => `
+        <div class="order-card">
+          <p style="font-weight:600">${q.question}</p>
+          ${q.answer ? `<p style="color:#065f46; margin-top:0.5rem">🩺 <strong>Vet:</strong> ${q.answer}</p>` : '<p style="color:#9ca3af; font-size:0.85rem">Awaiting response...</p>'}
+          <p style="font-size:0.75rem; color:#9ca3af">${new Date(q.created_at).toLocaleDateString()}</p>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      async function deleteProduce(id) {
+        if (!confirm("Remove this listing?")) return;
+        await api(`/produce/${id}`, { method: "DELETE" });
+        loadMyProduce();
+      }
+
+      async function updateOrder(id, status) {
+        await api(`/orders/${id}/status`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        });
+        loadOrders();
+      }
+
+      function getMyLocation() {
+        const btn = document.querySelector('[onclick="getMyLocation()"]');
+        btn.textContent = "📌 Getting location...";
+        btn.disabled = true;
+        if (!navigator.geolocation) {
+          alert("Geolocation is not supported by your browser");
+          btn.textContent = "📌 Use My Current Location";
+          btn.disabled = false;
+          return;
+        }
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const lat = pos.coords.latitude.toFixed(6);
+            const lng = pos.coords.longitude.toFixed(6);
+            document.querySelector('[name="farm_lat"]').value = lat;
+            document.querySelector('[name="farm_lng"]').value = lng;
+            document.getElementById("current-location").textContent =
+              `📌 Location captured: ${lat}, ${lng}`;
+            btn.textContent = "📌 Location Captured ✅";
+            btn.disabled = false;
+          },
+          (err) => {
+            alert(
+              `Could not get location: ${err.message}. Please enter coordinates manually.`,
+            );
+            btn.textContent = "📌 Use My Current Location";
+            btn.disabled = false;
+          },
+          { enableHighAccuracy: true, timeout: 10000 },
+        );
+      }
+
+      async function loadNotifications() {
+        try {
+          const res = await api("/notifications");
+          const notifications = await res.json();
+          const unread = notifications.filter((n) => !n.is_read);
+          const badge = document.getElementById("notif-badge");
+          if (unread.length > 0) {
+            badge.style.display = "inline";
+            badge.textContent = unread.length;
+          } else {
+            badge.style.display = "none";
+          }
+          const container = document.getElementById("notifications-list");
+          if (!notifications.length) {
+            container.innerHTML =
+              '<p style="color:#6b7280">No notifications yet.</p>';
+            return;
+          }
+          container.innerHTML = notifications
+            .map(
+              (n) => `
+          <div class="order-card" style="border-left:4px solid ${n.is_read ? "#e5e7eb" : "#10b981"}; background:${n.is_read ? "white" : "#f0fdf4"}">
+            <div class="order-info">
+              <h4 style="color:${n.is_read ? "#374151" : "#065f46"}">${n.title}</h4>
+              <p>${n.message}</p>
+              <p style="font-size:0.75rem; color:#9ca3af">${new Date(n.created_at).toLocaleString()}</p>
+            </div>
+            ${!n.is_read ? `<button onclick="markRead(${n.id})" style="padding:0.3rem 0.6rem; background:#f3f4f6; border:none; border-radius:0.5rem; cursor:pointer; font-size:0.75rem; white-space:nowrap">Mark read</button>` : ""}
+          </div>
+        `,
+            )
+            .join("");
+        } catch (e) {
+          console.log("Notifications error", e);
+        }
+      }
+
+      async function markRead(id) {
+        await api(`/notifications/${id}/read`, { method: "PUT" });
+        loadNotifications();
+      }
+
+      async function markAllRead() {
+        await api("/notifications/read-all", { method: "PUT" });
+        loadNotifications();
+      }
+
+      async function loadWeather(city) {
+        const apiKey = "261cd8c7496e2b461a938a73832902a7";
+        const container = document.getElementById("weather-forecast");
+        container.innerHTML = "Loading...";
+        try {
+          const res = await fetch(
+            `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`,
+          );
+          const data = await res.json();
+          const uniqueDates = [
+            ...new Set(
+              data.list.map(
+                (e) => new Date(e.dt * 1000).toISOString().split("T")[0],
+              ),
+            ),
+          ].slice(0, 5);
+          container.innerHTML = uniqueDates
+            .map((date) => {
+              const entry = data.list.find(
+                (e) =>
+                  new Date(e.dt * 1000).toISOString().split("T")[0] === date,
+              );
+              return `<div class="forecast-card">
+            <strong>${new Date(date).toLocaleDateString("en-US", { weekday: "short" })}</strong>
+            <img src="https://openweathermap.org/img/wn/${entry.weather[0].icon}@2x.png" style="width:50px" />
+            <div>${Math.round(entry.main.temp)}°C</div>
+            <div style="font-size:0.7rem">${entry.weather[0].description}</div>
+          </div>`;
+            })
+            .join("");
+        } catch (e) {
+          container.innerHTML = "Could not load weather";
+        }
+      }
+
+      document
+        .getElementById("produce-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const btn = document.getElementById("produce-btn");
+          btn.disabled = true;
+          btn.textContent = "Listing...";
+          const formData = new FormData(e.target);
+          const res = await api("/produce/add", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await res.json();
+          const msg = document.getElementById("produce-msg");
+          msg.style.display = "block";
+          if (res.ok) {
+            msg.className = "msg success";
+            msg.textContent = "Produce listed successfully!";
+            e.target.reset();
+            loadMyProduce();
+          } else {
+            msg.className = "msg error";
+            msg.textContent = data.detail || "Failed to list produce";
+          }
+          btn.disabled = false;
+          btn.textContent = "List Produce";
+        });
+
+      document
+        .getElementById("location-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          const body = Object.fromEntries(formData);
+          const res = await api("/farmer/location", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+          const msg = document.getElementById("location-msg");
+          msg.style.display = "block";
+          if (res.ok) {
+            msg.className = "msg success";
+            msg.textContent = "Farm location saved!";
+          } else {
+            msg.className = "msg error";
+            msg.textContent = "Failed to save location";
+          }
+        });
+
+      document
+        .getElementById("vet-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          const res = await api("/vet/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question: formData.get("question") }),
+          });
+          const msg = document.getElementById("vet-msg");
+          msg.style.display = "block";
+          if (res.ok) {
+            msg.className = "msg success";
+            msg.textContent = "Question submitted! A vet will respond soon.";
+            e.target.reset();
+            loadMyQuestions();
+          } else {
+            msg.className = "msg error";
+            msg.textContent = "Failed to submit question";
+          }
+        });
+
+      loadProfile();
+      loadMyProduce();
+      loadOrders();
+      loadMyQuestions();
+      loadNotifications();
+      loadWeather("Lagos");
+    </script>
+  </body>
+</html>

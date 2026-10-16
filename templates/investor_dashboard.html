@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriNet — Investor Dashboard</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+  </head>
+  <body class="bg-gradient">
+    <header class="header container">
+      <a
+        href="/"
+        style="
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 1.25rem;
+          color: #065f46;
+        "
+        >🌿 AgriNet</a
+      >
+      <div style="display: flex; align-items: center; gap: 0.75rem">
+        <span id="user-name" style="font-weight: 600; color: #065f46"></span>
+        <span class="role-badge investor-badge">💰 Investor</span>
+        <button class="btn-logout" onclick="logout()">Log Out</button>
+      </div>
+    </header>
+
+    <div class="dash-container">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <div class="stat-value" id="total-invested">₦0</div>
+            <div class="stat-label">Total Invested</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📈</div>
+          <div class="stat-info">
+            <div class="stat-value" id="total-returns">₦0</div>
+            <div class="stat-label">Expected Returns</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🌱</div>
+          <div class="stat-info">
+            <div class="stat-value" id="active-investments">0</div>
+            <div class="stat-label">Active Investments</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <div class="stat-value" id="completed-investments">0</div>
+            <div class="stat-label">Completed</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-tabs">
+        <button
+          class="dash-tab active"
+          onclick="showTab('opportunities', this)"
+        >
+          🌱 Opportunities
+        </button>
+        <button class="dash-tab" onclick="showTab('my-investments', this)">
+          💰 My Investments
+        </button>
+        <button class="dash-tab" onclick="showTab('farmers', this)">
+          👨‍🌾 Farmer Profiles
+        </button>
+        <button class="dash-tab" onclick="showTab('market', this)">
+          📊 Market Prices
+        </button>
+      </div>
+
+      <!-- Opportunities Tab -->
+      <div id="tab-opportunities" class="dash-tab-content active">
+        <div class="dash-card">
+          <h3>🌱 Investment Opportunities</h3>
+          <div id="invest-msg" class="msg" style="display: none"></div>
+          <div class="product-grid">
+            <div class="product-card">
+              <div
+                class="product-photo"
+                style="
+                  background-image: url(&quot;/static/images/maize.jpg&quot;);
+                  background-size: cover;
+                  background-position: center;
+                "
+              ></div>
+              <div class="product-body">
+                <span class="verified-badge">🌽 Grains</span>
+                <h4>Maize Farming (90 days)</h4>
+                <p class="product-meta">Expected Return: 18%</p>
+                <p class="product-meta">Min Investment: ₦50,000</p>
+                <p class="product-price">₦50,000+</p>
+                <div class="product-buttons">
+                  <button
+                    class="submit-btn"
+                    style="flex: 1"
+                    onclick="openInvestModal('Maize', 90, 18, 50000)"
+                  >
+                    Invest Now
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="product-card">
+              <div
+                class="product-photo"
+                style="
+                  background-image: url(&quot;/static/images/broiler-feed.jpg&quot;);
+                  background-size: cover;
+                  background-position: center;
+                "
+              ></div>
+              <div class="product-body">
+                <span class="verified-badge">🐔 Poultry</span>
+                <h4>Broiler Farming (6 weeks)</h4>
+                <p class="product-meta">Expected Return: 22%</p>
+                <p class="product-meta">Min Investment: ₦30,000</p>
+                <p class="product-price">₦30,000+</p>
+                <div class="product-buttons">
+                  <button
+                    class="submit-btn"
+                    style="flex: 1"
+                    onclick="openInvestModal('Broilers', 42, 22, 30000)"
+                  >
+                    Invest Now
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="product-card">
+              <div
+                class="product-photo"
+                style="
+                  background-image: url(&quot;/static/images/catfish-feed.jpg&quot;);
+                  background-size: cover;
+                  background-position: center;
+                "
+              ></div>
+              <div class="product-body">
+                <span class="verified-badge">🐟 Aquaculture</span>
+                <h4>Catfish Farming (4 months)</h4>
+                <p class="product-meta">Expected Return: 25%</p>
+                <p class="product-meta">Min Investment: ₦40,000</p>
+                <p class="product-price">₦40,000+</p>
+                <div class="product-buttons">
+                  <button
+                    class="submit-btn"
+                    style="flex: 1"
+                    onclick="openInvestModal('Catfish', 120, 25, 40000)"
+                  >
+                    Invest Now
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="product-card">
+              <div
+                class="product-photo"
+                style="
+                  background-image: url(&quot;/static/images/tomatoes.jpeg&quot;);
+                  background-size: cover;
+                  background-position: center;
+                "
+              ></div>
+              <div class="product-body">
+                <span class="verified-badge">🍅 Vegetables</span>
+                <h4>Tomato Farming (60 days)</h4>
+                <p class="product-meta">Expected Return: 20%</p>
+                <p class="product-meta">Min Investment: ₦25,000</p>
+                <p class="product-price">₦25,000+</p>
+                <div class="product-buttons">
+                  <button
+                    class="submit-btn"
+                    style="flex: 1"
+                    onclick="openInvestModal('Tomatoes', 60, 20, 25000)"
+                  >
+                    Invest Now
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- My Investments Tab -->
+      <div id="tab-my-investments" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>💰 My Investments</h3>
+          <div id="investments-list"></div>
+        </div>
+      </div>
+
+      <!-- Farmer Profiles Tab -->
+      <div id="tab-farmers" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>👨‍🌾 Verified Farmer Profiles</h3>
+          <div id="farmer-profiles" class="product-grid"></div>
+        </div>
+      </div>
+
+      <!-- Market Prices Tab -->
+      <div id="tab-market" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>📊 Current Market Prices</h3>
+          <div id="market-prices"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Investment Modal -->
+    <div
+      id="invest-modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div
+        style="
+          background: white;
+          border-radius: 1.5rem;
+          padding: 2rem;
+          max-width: 400px;
+          width: 90%;
+          margin: auto;
+        "
+      >
+        <h3 id="modal-title">Invest</h3>
+        <div class="form-group">
+          <label>Investment Amount (₦)</label>
+          <input
+            type="number"
+            id="invest-amount"
+            placeholder="e.g. 50000"
+            oninput="calcReturn()"
+          />
+          <small id="min-amount-hint" style="color: #6b7280"></small>
+        </div>
+        <div class="form-group">
+          <label>Tenor</label>
+          <select id="invest-tenor">
+            <option value="short">Short</option>
+            <option value="medium">Medium</option>
+            <option value="long">Long</option>
+          </select>
+        </div>
+        <div
+          style="
+            background: #f0fdf4;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+          "
+        >
+          <p style="margin: 0; font-size: 0.9rem; color: #6b7280">
+            Expected return
+          </p>
+          <p
+            id="expected-return-text"
+            style="
+              margin: 0.25rem 0 0;
+              font-size: 1.1rem;
+              font-weight: 700;
+              color: #065f46;
+            "
+          >
+            —
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem">
+          <button class="submit-btn" onclick="submitInvestment()">
+            Confirm
+          </button>
+          <button
+            onclick="closeModal()"
+            style="
+              flex: 1;
+              padding: 0.75rem;
+              background: #f3f4f6;
+              border: none;
+              border-radius: 0.75rem;
+              cursor: pointer;
+              font-weight: 600;
+            "
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      if (!token || role !== "investor") window.location.href = "/login";
+
+      let currentCrop = "",
+        currentReturn = 0,
+        currentMin = 0;
+
+      function showTab(name, btn) {
+        document
+          .querySelectorAll(".dash-tab")
+          .forEach((t) => t.classList.remove("active"));
+        document
+          .querySelectorAll(".dash-tab-content")
+          .forEach((t) => t.classList.remove("active"));
+        document.getElementById(`tab-${name}`).classList.add("active");
+        btn.classList.add("active");
+      }
+
+      function logout() {
+        localStorage.clear();
+        window.location.href = "/";
+      }
+
+      async function api(url, options = {}) {
+        return fetch(url, {
+          ...options,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            ...(options.headers || {}),
+          },
+        });
+      }
+
+      async function loadProfile() {
+        const res = await api("/auth/me");
+        const user = await res.json();
+        document.getElementById("user-name").textContent = user.full_name;
+      }
+
+      function openInvestModal(crop, days, returnPct, minAmount) {
+        currentCrop = crop;
+        currentReturn = returnPct;
+        currentMin = minAmount;
+        document.getElementById("modal-title").textContent =
+          `Invest in ${crop} (${days} days)`;
+        document.getElementById("invest-amount").value = "";
+        document.getElementById("min-amount-hint").textContent =
+          `Minimum: ₦${minAmount.toLocaleString()}`;
+        document.getElementById("expected-return-text").textContent = "—";
+        document.getElementById("invest-modal").style.display = "flex";
+      }
+
+      function calcReturn() {
+        const amt =
+          parseFloat(document.getElementById("invest-amount").value) || 0;
+        const ret = (amt * currentReturn) / 100;
+        document.getElementById("expected-return-text").textContent = amt
+          ? `₦${(amt + ret).toLocaleString()} (+₦${ret.toLocaleString()})`
+          : "—";
+      }
+
+      function closeModal() {
+        document.getElementById("invest-modal").style.display = "none";
+      }
+
+      async function submitInvestment() {
+        const amount = parseInt(document.getElementById("invest-amount").value);
+        const tenor = document.getElementById("invest-tenor").value;
+        if (!amount || amount < currentMin) {
+          alert(`Minimum investment is ₦${currentMin.toLocaleString()}`);
+          return;
+        }
+        const res = await api("/investments/pledge", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            crop: currentCrop,
+            amount,
+            tenor,
+            expected_return: (amount * currentReturn) / 100,
+          }),
+        });
+        if (res.ok) {
+          closeModal();
+          const msg = document.getElementById("invest-msg");
+          msg.style.display = "block";
+          msg.className = "msg success";
+          msg.textContent = `Investment of ₦${amount.toLocaleString()} in ${currentCrop} confirmed!`;
+          loadMyInvestments();
+        } else {
+          alert("Failed to submit investment");
+        }
+      }
+
+      async function loadMyInvestments() {
+        const res = await api("/investments/my");
+        const investments = await res.json();
+        const active = investments.filter((i) => i.status === "active");
+        const completed = investments.filter((i) => i.status === "completed");
+        const totalInvested = investments.reduce((s, i) => s + i.amount, 0);
+        const totalReturns = investments.reduce(
+          (s, i) => s + (i.expected_return || 0),
+          0,
+        );
+        document.getElementById("total-invested").textContent =
+          `₦${totalInvested.toLocaleString()}`;
+        document.getElementById("total-returns").textContent =
+          `₦${(totalInvested + totalReturns).toLocaleString()}`;
+        document.getElementById("active-investments").textContent =
+          active.length;
+        document.getElementById("completed-investments").textContent =
+          completed.length;
+
+        const container = document.getElementById("investments-list");
+        if (!investments.length) {
+          container.innerHTML =
+            '<p style="color:#6b7280">No investments yet. Browse opportunities above!</p>';
+          return;
+        }
+        container.innerHTML = investments
+          .map(
+            (i) => `
+        <div class="order-card">
+          <div class="order-info">
+            <h4>${i.crop}</h4>
+            <p>Amount: ₦${i.amount.toLocaleString()} • Tenor: ${i.tenor}</p>
+            <p style="color:#065f46; font-weight:600">Expected: ₦${((i.amount || 0) + (i.expected_return || 0)).toLocaleString()}</p>
+            <p style="font-size:0.8rem; color:#6b7280">${new Date(i.created_at).toLocaleDateString()}</p>
+          </div>
+          <span class="status-badge status-${i.status}">${i.status}</span>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      async function loadFarmerProfiles() {
+        const res = await api("/farmers/profiles");
+        const farmers = await res.json();
+        const container = document.getElementById("farmer-profiles");
+        if (!farmers.length) {
+          container.innerHTML =
+            '<p style="color:#6b7280">No verified farmers yet.</p>';
+          return;
+        }
+        container.innerHTML = farmers
+          .map(
+            (f) => `
+        <div class="product-card">
+          <div class="product-photo" style="background:#d1fae5; display:flex; align-items:center; justify-content:center; font-size:3rem; height:160px">👨‍🌾</div>
+          <div class="product-body">
+            <h4>${f.full_name}</h4>
+            <p class="product-meta">📍 ${f.farm_location || "Location not set"}</p>
+            <p class="product-meta">Active Listings: ${f.produce_count}</p>
+            <span class="verified-badge">✅ Verified Farmer</span>
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      async function loadMarketPrices() {
+        const res = await fetch("/produce");
+        const produce = await res.json();
+        const container = document.getElementById("market-prices");
+        if (!produce.length) {
+          container.innerHTML =
+            '<p style="color:#6b7280">No market data yet.</p>';
+          return;
+        }
+        container.innerHTML = `
+        <div style="overflow-x:auto">
+          <table style="width:100%; border-collapse:collapse">
+            <thead>
+              <tr style="background:#f0fdf4">
+                <th style="padding:0.75rem; text-align:left; border-bottom:2px solid #e5e7eb; color:#065f46">Produce</th>
+                <th style="padding:0.75rem; text-align:left; border-bottom:2px solid #e5e7eb; color:#065f46">Category</th>
+                <th style="padding:0.75rem; text-align:left; border-bottom:2px solid #e5e7eb; color:#065f46">Price</th>
+                <th style="padding:0.75rem; text-align:left; border-bottom:2px solid #e5e7eb; color:#065f46">Location</th>
+                <th style="padding:0.75rem; text-align:left; border-bottom:2px solid #e5e7eb; color:#065f46">Qty Available</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${produce
+                .map(
+                  (p) => `
+                <tr style="border-bottom:1px solid #f3f4f6">
+                  <td style="padding:0.75rem">${p.title}</td>
+                  <td style="padding:0.75rem">${p.category}</td>
+                  <td style="padding:0.75rem; color:#065f46; font-weight:700">₦${p.price.toLocaleString()}/${p.unit}</td>
+                  <td style="padding:0.75rem">${p.location}</td>
+                  <td style="padding:0.75rem">${p.quantity}</td>
+                </tr>
+              `,
+                )
+                .join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+      }
+
+      loadProfile();
+      loadMyInvestments();
+      loadFarmerProfiles();
+      loadMarketPrices();
+    </script>
+  </body>
+</html>

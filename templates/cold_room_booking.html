@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriNet — Cold Room Booking</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+  </head>
+  <body class="bg-gradient">
+    <header class="header container">
+      <a
+        href="/"
+        style="
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 1.25rem;
+          color: #065f46;
+        "
+        >🌿 AgriNet</a
+      >
+      <div style="display: flex; align-items: center; gap: 0.75rem">
+        <span id="user-name" style="font-weight: 600; color: #065f46"></span>
+        <button onclick="goBack()" class="btn-logout">← Back</button>
+        <button class="btn-logout" onclick="logout()">Log Out</button>
+      </div>
+    </header>
+
+    <div class="dash-container">
+      <div class="dash-tabs">
+        <button class="dash-tab active" onclick="showTab('browse', this)">
+          ❄️ Browse Cold Rooms
+        </button>
+        <button class="dash-tab" onclick="showTab('my-bookings', this)">
+          📋 My Bookings
+        </button>
+      </div>
+
+      <!-- Browse Tab -->
+      <div id="tab-browse" class="dash-tab-content active">
+        <div class="dash-card">
+          <h3>❄️ Available Cold Rooms</h3>
+          <div
+            style="
+              display: flex;
+              gap: 0.5rem;
+              margin-bottom: 1rem;
+              flex-wrap: wrap;
+            "
+          >
+            <select
+              id="state-filter"
+              onchange="loadColdRooms()"
+              style="
+                padding: 0.5rem;
+                border-radius: 0.5rem;
+                border: 1px solid #d1d5db;
+                flex: 1;
+              "
+            >
+              <option value="">All States</option>
+              <option>Lagos</option>
+              <option>Kano</option>
+              <option>FCT Abuja</option>
+              <option>Rivers</option>
+              <option>Oyo</option>
+              <option>Kaduna</option>
+              <option>Enugu</option>
+              <option>Edo</option>
+            </select>
+          </div>
+          <div id="cold-rooms-list" class="product-grid"></div>
+        </div>
+      </div>
+
+      <!-- My Bookings Tab -->
+      <div id="tab-my-bookings" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>📋 My Cold Room Bookings</h3>
+          <div id="my-bookings-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div
+      id="booking-modal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+        overflow-y: auto;
+      "
+    >
+      <div
+        style="
+          background: white;
+          border-radius: 1.5rem;
+          padding: 2rem;
+          max-width: 480px;
+          width: 90%;
+          margin: 2rem auto;
+        "
+      >
+        <h3 id="modal-room-name" style="color: #065f46"></h3>
+        <p
+          id="modal-room-info"
+          style="color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem"
+        ></p>
+        <div id="booking-msg" class="msg" style="display: none"></div>
+        <div class="form-group">
+          <label>Produce / Items to Store</label>
+          <input
+            type="text"
+            id="produce-desc"
+            placeholder="e.g. 5 crates of tomatoes"
+          />
+        </div>
+        <div class="form-group">
+          <label>Quantity (tons)</label>
+          <input
+            type="number"
+            id="quantity-tons"
+            placeholder="e.g. 0.5"
+            step="0.1"
+            min="0.1"
+            oninput="calcCost()"
+          />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Start Date</label>
+            <input type="date" id="start-date" oninput="calcCost()" />
+          </div>
+          <div class="form-group">
+            <label>End Date</label>
+            <input type="date" id="end-date" oninput="calcCost()" />
+          </div>
+        </div>
+        <div
+          id="cost-summary"
+          style="
+            display: none;
+            background: #f0fdf4;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+          "
+        >
+          <p style="margin: 0; color: #065f46; font-weight: 600">
+            Cost Summary
+          </p>
+          <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151">
+            Days: <span id="summary-days"></span>
+          </p>
+          <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #374151">
+            Rate: ₦<span id="summary-rate"></span>/day
+          </p>
+          <p
+            style="
+              margin: 0.5rem 0 0;
+              font-size: 1.1rem;
+              font-weight: 700;
+              color: #065f46;
+            "
+          >
+            Total: ₦<span id="summary-total"></span>
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem">
+          <button class="submit-btn" onclick="submitBooking()">
+            Book & Pay Later
+          </button>
+          <button
+            onclick="closeModal()"
+            style="
+              flex: 1;
+              padding: 0.75rem;
+              background: #f3f4f6;
+              border: none;
+              border-radius: 0.75rem;
+              cursor: pointer;
+              font-weight: 600;
+            "
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      const name = localStorage.getItem("name");
+
+      // Strict auth check
+      if (!token) {
+        window.location.href = "/login";
+      } else if (!["farmer", "consumer"].includes(role)) {
+        // Redirect vendors, vets, investors to their own dashboard
+        const routes = {
+          vendor: "/vendor-dashboard",
+          vet: "/vet-dashboard",
+          investor: "/investor-dashboard",
+          admin: "/admin-dashboard",
+        };
+        alert("Cold room booking is only available for farmers and consumers.");
+        window.location.href = routes[role] || "/";
+      }
+
+      let selectedRoom = null;
+
+      function goBack() {
+        const routes = {
+          farmer: "/farmer-dashboard",
+          consumer: "/consumer-dashboard",
+          investor: "/investor-dashboard",
+          vet: "/vet-dashboard",
+        };
+        window.location.href = routes[role] || "/";
+      }
+
+      function logout() {
+        localStorage.clear();
+        window.location.href = "/";
+      }
+
+      function showTab(name, btn) {
+        document
+          .querySelectorAll(".dash-tab")
+          .forEach((t) => t.classList.remove("active"));
+        document
+          .querySelectorAll(".dash-tab-content")
+          .forEach((t) => t.classList.remove("active"));
+        document.getElementById(`tab-${name}`).classList.add("active");
+        btn.classList.add("active");
+      }
+
+      async function api(url, options = {}) {
+        return fetch(url, {
+          ...options,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            ...(options.headers || {}),
+          },
+        });
+      }
+
+      async function loadProfile() {
+        const res = await api("/auth/me");
+        const user = await res.json();
+        document.getElementById("user-name").textContent = user.full_name;
+      }
+
+      async function loadColdRooms() {
+        const state = document.getElementById("state-filter").value;
+        const url = state
+          ? `/cold-rooms?state=${encodeURIComponent(state)}`
+          : "/cold-rooms";
+        const res = await fetch(url);
+        const rooms = await res.json();
+        const container = document.getElementById("cold-rooms-list");
+        if (!rooms.length) {
+          container.innerHTML =
+            '<p style="color:#6b7280">No cold rooms available in this state.</p>';
+          return;
+        }
+        container.innerHTML = rooms
+          .map(
+            (r) => `
+        <div class="product-card">
+          <div class="product-photo" style="background:linear-gradient(135deg, #dbeafe, #bfdbfe); display:flex; align-items:center; justify-content:center; font-size:3rem">❄️</div>
+          <div class="product-body">
+            <h4>${r.name}</h4>
+            <p class="product-meta">📍 ${r.city}, ${r.state}</p>
+            <p class="product-meta">🌡 ${r.temperature}</p>
+            <p class="product-meta">📦 ${r.address || ""}</p>
+            <p class="product-meta" style="color:${r.available_slots > 5 ? "#065f46" : "#f59e0b"}">
+              ${r.available_slots} slots available of ${r.total_slots}
+            </p>
+            <p class="product-price">₦${r.rate_per_day.toLocaleString()}/day</p>
+            <div class="product-buttons">
+              ${
+                r.available_slots > 0
+                  ? `<button class="submit-btn" style="flex:1" onclick='openBookingModal(${JSON.stringify(r).replace(/'/g, "&apos;")})'>Book Slot</button>`
+                  : `<button disabled style="flex:1; padding:0.45rem; background:#9ca3af; color:white; border:none; border-radius:0.5rem">Full</button>`
+              }
+            </div>
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      function openBookingModal(room) {
+        selectedRoom = room;
+        document.getElementById("modal-room-name").textContent =
+          `❄️ ${room.name}`;
+        document.getElementById("modal-room-info").textContent =
+          `${room.city}, ${room.state} • ${room.temperature} • ₦${room.rate_per_day.toLocaleString()}/day`;
+        document.getElementById("booking-msg").style.display = "none";
+        document.getElementById("produce-desc").value = "";
+        document.getElementById("quantity-tons").value = "";
+        document.getElementById("start-date").value = "";
+        document.getElementById("end-date").value = "";
+        document.getElementById("cost-summary").style.display = "none";
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById("start-date").min = today;
+        document.getElementById("end-date").min = today;
+
+        document.getElementById("booking-modal").style.display = "flex";
+      }
+
+      function closeModal() {
+        document.getElementById("booking-modal").style.display = "none";
+      }
+
+      function calcCost() {
+        const start = document.getElementById("start-date").value;
+        const end = document.getElementById("end-date").value;
+        if (!start || !end || !selectedRoom) return;
+        const days = Math.max(
+          1,
+          Math.ceil((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)),
+        );
+        const total = days * selectedRoom.rate_per_day;
+        document.getElementById("summary-days").textContent = days;
+        document.getElementById("summary-rate").textContent =
+          selectedRoom.rate_per_day.toLocaleString();
+        document.getElementById("summary-total").textContent =
+          total.toLocaleString();
+        document.getElementById("cost-summary").style.display = "block";
+      }
+
+      async function submitBooking() {
+        const produceDesc = document.getElementById("produce-desc").value;
+        const quantityTons = document.getElementById("quantity-tons").value;
+        const startDate = document.getElementById("start-date").value;
+        const endDate = document.getElementById("end-date").value;
+
+        if (!produceDesc || !quantityTons || !startDate || !endDate) {
+          const msg = document.getElementById("booking-msg");
+          msg.style.display = "block";
+          msg.className = "msg error";
+          msg.textContent = "Please fill all fields";
+          return;
+        }
+        if (new Date(endDate) <= new Date(startDate)) {
+          const msg = document.getElementById("booking-msg");
+          msg.style.display = "block";
+          msg.className = "msg error";
+          msg.textContent = "End date must be after start date";
+          return;
+        }
+
+        const res = await api("/cold-rooms/book", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            cold_room_id: selectedRoom.id,
+            produce_description: produceDesc,
+            quantity_tons: parseFloat(quantityTons),
+            start_date: startDate,
+            end_date: endDate,
+          }),
+        });
+        const data = await res.json();
+        const msg = document.getElementById("booking-msg");
+        msg.style.display = "block";
+        if (res.ok) {
+          msg.className = "msg success";
+          msg.textContent = `Booking confirmed! ${data.days} days at ₦${data.total_cost.toLocaleString()}. Our team will contact you.`;
+          loadColdRooms();
+          loadMyBookings();
+          setTimeout(closeModal, 3000);
+        } else {
+          msg.className = "msg error";
+          msg.textContent = data.detail || "Booking failed";
+        }
+      }
+
+      async function loadMyBookings() {
+        const res = await api("/cold-rooms/my-bookings");
+        const bookings = await res.json();
+        const container = document.getElementById("my-bookings-list");
+        if (!bookings.length) {
+          container.innerHTML = '<p style="color:#6b7280">No bookings yet.</p>';
+          return;
+        }
+        container.innerHTML = bookings
+          .map(
+            (b) => `
+        <div class="order-card">
+          <div class="order-info">
+            <h4>❄️ ${b.cold_room_name}</h4>
+            <p>📍 ${b.cold_room_city} • ${b.produce_description}</p>
+            <p>${new Date(b.start_date).toLocaleDateString()} → ${new Date(b.end_date).toLocaleDateString()} (${b.days} days)</p>
+            <p style="font-weight:700; color:#065f46">₦${b.total_cost.toLocaleString()}</p>
+            <p style="font-size:0.8rem; color:#6b7280">${new Date(b.created_at).toLocaleDateString()}</p>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:0.5rem; align-items:flex-end">
+            <span class="status-badge status-${b.status}">${b.status}</span>
+            <span class="status-badge ${b.payment_status === "paid" ? "status-delivered" : "status-pending"}">${b.payment_status}</span>
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      loadProfile();
+      loadColdRooms();
+      loadMyBookings();
+    </script>
+  </body>
+</html>

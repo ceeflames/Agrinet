@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redirecting...</title>
+  </head>
+  <body>
+    <script>
+      const role = localStorage.getItem("role");
+      const routes = {
+        farmer: "/farmer-dashboard",
+        consumer: "/consumer-dashboard",
+        investor: "/investor-dashboard",
+        vet: "/vet-dashboard",
+        vendor: "/vendor-dashboard",
+        admin: "/admin-dashboard",
+      };
+      window.location.href = routes[role] || "/login";
+    </script>
+  </body>
+</html>

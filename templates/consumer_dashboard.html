@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriNet — Buyer Dashboard</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/dashboard.css" />
+  </head>
+  <body class="bg-gradient">
+    <header class="header container">
+      <a
+        href="/"
+        style="
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 1.25rem;
+          color: #065f46;
+        "
+        >🌿 AgriNet</a
+      >
+      <div style="display: flex; align-items: center; gap: 0.75rem">
+        <span id="user-name" style="font-weight: 600; color: #065f46"></span>
+        <span class="role-badge consumer-badge">🛒 Buyer</span>
+        <button class="btn-logout" onclick="logout()">Log Out</button>
+      </div>
+    </header>
+
+    <div class="dash-container">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon">🛒</div>
+          <div class="stat-info">
+            <div class="stat-value" id="cart-total">0</div>
+            <div class="stat-label">Items in Cart</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-info">
+            <div class="stat-value" id="total-orders">0</div>
+            <div class="stat-label">Total Orders</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🚚</div>
+          <div class="stat-info">
+            <div class="stat-value" id="active-deliveries">0</div>
+            <div class="stat-label">Active Deliveries</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">❄️</div>
+          <div class="stat-info">
+            <div class="stat-value" id="cold-bookings">0</div>
+            <div class="stat-label">Cold Room Bookings</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-tabs">
+        <button class="dash-tab active" onclick="showTab('browse')">
+          🌾 Browse Produce
+        </button>
+        <button class="dash-tab" onclick="showTab('cart')">🛒 My Cart</button>
+        <button class="dash-tab" onclick="showTab('orders')">
+          📦 Order History
+        </button>
+        <button class="dash-tab" onclick="showTab('deliveries')">
+          🚚 Track Deliveries
+        </button>
+        <button class="dash-tab" onclick="showTab('cold')">
+          ❄️ Cold Rooms
+        </button>
+      </div>
+
+      <!-- Browse Tab -->
+      <div id="tab-browse" class="dash-tab-content active">
+        <div class="dash-card">
+          <h3>🌾 Browse Farm Produce</h3>
+          <div
+            style="
+              display: flex;
+              gap: 0.5rem;
+              margin-bottom: 1rem;
+              flex-wrap: wrap;
+            "
+          >
+            <input
+              type="text"
+              id="browse-search"
+              placeholder="Search produce..."
+              style="
+                flex: 1;
+                padding: 0.5rem;
+                border-radius: 0.5rem;
+                border: 1px solid #d1d5db;
+              "
+              oninput="filterProduce()"
+            />
+            <select
+              id="browse-category"
+              style="
+                padding: 0.5rem;
+                border-radius: 0.5rem;
+                border: 1px solid #d1d5db;
+              "
+              onchange="filterProduce()"
+            >
+              <option value="">All Categories</option>
+              <option value="grains">Grains</option>
+              <option value="vegetables">Vegetables</option>
+              <option value="fruits">Fruits</option>
+              <option value="livestock">Livestock</option>
+              <option value="dairy">Dairy</option>
+            </select>
+          </div>
+          <div id="browse-listings" class="product-grid"></div>
+        </div>
+      </div>
+
+      <!-- Cart Tab -->
+      <div id="tab-cart" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>🛒 My Cart</h3>
+          <div id="cart-items"></div>
+          <div
+            id="cart-summary"
+            style="
+              display: none;
+              margin-top: 1rem;
+              padding-top: 1rem;
+              border-top: 1px solid #e5e7eb;
+            "
+          >
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                font-weight: 700;
+                font-size: 1.1rem;
+              "
+            >
+              <span>Total:</span>
+              <span id="cart-total-price" style="color: #065f46"></span>
+            </div>
+            <div class="form-group" style="margin-top: 1rem">
+              <label>Delivery Address</label>
+              <input
+                type="text"
+                id="delivery-address"
+                placeholder="Enter delivery address"
+              />
+            </div>
+            <button
+              class="submit-btn"
+              onclick="placeOrder()"
+              style="margin-top: 0.5rem"
+            >
+              Place Order
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order History Tab -->
+      <div id="tab-orders" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>📦 Order History</h3>
+          <div id="order-history"></div>
+        </div>
+      </div>
+
+      <!-- Track Deliveries Tab -->
+      <div id="tab-deliveries" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>🚚 Track Deliveries</h3>
+          <div id="delivery-tracking"></div>
+        </div>
+      </div>
+
+      <!-- Cold Rooms Tab -->
+      <div id="tab-cold" class="dash-tab-content">
+        <div class="dash-card">
+          <h3>❄️ Book Cold Room Storage</h3>
+          <div id="cold-msg" class="msg" style="display: none"></div>
+          <div class="product-grid">
+            <div class="product-card">
+              <div
+                class="product-photo"
+                style="
+                  background-image: url(&quot;/static/images/cold-lagos.jpg&quot;);
+                  background-size: cover;
+                  background-position: center;
+                "
+              ></div>
+              <div class="product-body">
+                <h4>Lagos Mainland Cold Hub</h4>
+                <p class="product-meta">📍 Lagos • 2–4°C</p>
+                <p class="product-meta">Slots Free: 12</p>
+                <p class="product-price">₦3,500/day</p>
+                <div class="product-buttons">
+                  <button
+                    class="submit-btn"
+                    style="flex: 1"
+                    onclick="window.location.href = '/cold-room-booking'"
+                  >
+                    Book Slot
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="product-card">
+              <div
+                class="product-photo"
+                style="
+                  background-image: url(&quot;/static/images/cold-kano.jpg&quot;);
+                  background-size: cover;
+                  background-position: center;
+                "
+              ></div>
+              <div class="product-body">
+                <h4>Kano Produce Cold Store</h4>
+                <p class="product-meta">📍 Kano • 0–2°C</p>
+                <p class="product-meta">Slots Free: 5</p>
+                <p class="product-price">₦3,000/day</p>
+                <div class="product-buttons">
+                  <button
+                    class="submit-btn"
+                    style="flex: 1"
+                    onclick="window.location.href = '/cold-room-booking'"
+                  >
+                    Book Slot
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="product-card">
+              <div
+                class="product-photo"
+                style="
+                  background-image: url(&quot;/static/images/cold-abuja.jpeg&quot;);
+                  background-size: cover;
+                  background-position: center;
+                "
+              ></div>
+              <div class="product-body">
+                <h4>Abuja Fresh Cold Store</h4>
+                <p class="product-meta">📍 Abuja • 1–3°C</p>
+                <p class="product-meta">Slots Free: 8</p>
+                <p class="product-price">₦4,000/day</p>
+                <div class="product-buttons">
+                  <button
+                    class="submit-btn"
+                    style="flex: 1"
+                    onclick="window.location.href = '/cold-room-booking'"
+                  >
+                    Book Slot
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      if (!token) window.location.href = "/login";
+      let cart = [];
+      let allProduce = [];
+
+      function showTab(name) {
+        document
+          .querySelectorAll(".dash-tab")
+          .forEach((t) => t.classList.remove("active"));
+        document
+          .querySelectorAll(".dash-tab-content")
+          .forEach((t) => t.classList.remove("active"));
+        document.getElementById(`tab-${name}`).classList.add("active");
+        event.target.classList.add("active");
+      }
+
+      function logout() {
+        localStorage.clear();
+        window.location.href = "/";
+      }
+
+      async function api(url, options = {}) {
+        return fetch(url, {
+          ...options,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            ...(options.headers || {}),
+          },
+        });
+      }
+
+      async function loadProfile() {
+        const res = await api("/auth/me");
+        const user = await res.json();
+        document.getElementById("user-name").textContent = user.full_name;
+      }
+
+      async function loadProduce() {
+        const res = await fetch("/produce");
+        allProduce = await res.json();
+        renderProduce(allProduce);
+      }
+
+      function renderProduce(produce) {
+        const container = document.getElementById("browse-listings");
+        if (!produce.length) {
+          container.innerHTML =
+            '<p style="color:#6b7280">No produce available yet.</p>';
+          return;
+        }
+        container.innerHTML = produce
+          .map(
+            (p) => `
+        <div class="product-card">
+          <div class="product-photo" style="${p.image_path ? `background-image:url('${p.image_path}')` : "background:#f3f4f6"}">
+            ${!p.image_path ? '<div class="no-photo">No photo</div>' : ""}
+          </div>
+          <div class="product-body">
+            <span class="verified-badge">✅ Verified</span>
+            <h4>${p.title}</h4>
+            <p class="product-meta">📍 ${p.location} • per ${p.unit}</p>
+            <p class="product-price">₦${p.price.toLocaleString()}</p>
+            <div class="product-buttons">
+              <button class="add-to-cart-btn" data-id="${p.id}" onclick="addToCart(${JSON.stringify(p).replace(/"/g, "&quot;")})">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      function filterProduce() {
+        const query = document
+          .getElementById("browse-search")
+          .value.toLowerCase();
+        const cat = document.getElementById("browse-category").value;
+        const filtered = allProduce.filter(
+          (p) =>
+            (!query || p.title.toLowerCase().includes(query)) &&
+            (!cat || p.category === cat),
+        );
+        renderProduce(filtered);
+      }
+
+      function addToCart(produce) {
+        const existing = cart.find((i) => i.id === produce.id);
+        if (existing) {
+          existing.quantity++;
+        } else {
+          cart.push({ ...produce, quantity: 1 });
+        }
+        updateCartUI();
+        document.getElementById("cart-total").textContent = cart.reduce(
+          (s, i) => s + i.quantity,
+          0,
+        );
+      }
+
+      function updateCartUI() {
+        const container = document.getElementById("cart-items");
+        const summary = document.getElementById("cart-summary");
+        if (!cart.length) {
+          container.innerHTML =
+            '<p style="color:#6b7280">Your cart is empty.</p>';
+          summary.style.display = "none";
+          return;
+        }
+        const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+        container.innerHTML = cart
+          .map(
+            (item, idx) => `
+        <div class="order-card">
+          <div class="order-info">
+            <h4>${item.title}</h4>
+            <p>₦${item.price.toLocaleString()} × ${item.quantity} = ₦${(item.price * item.quantity).toLocaleString()}</p>
+          </div>
+          <div style="display:flex; gap:0.5rem; align-items:center">
+            <button onclick="changeQty(${idx}, -1)" style="padding:0.2rem 0.5rem; border-radius:0.3rem; border:1px solid #d1d5db; cursor:pointer">−</button>
+            <span>${item.quantity}</span>
+            <button onclick="changeQty(${idx}, 1)" style="padding:0.2rem 0.5rem; border-radius:0.3rem; border:1px solid #d1d5db; cursor:pointer">+</button>
+            <button onclick="removeFromCart(${idx})" style="padding:0.2rem 0.5rem; border-radius:0.3rem; border:none; background:#fee2e2; color:#991b1b; cursor:pointer">✕</button>
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+        document.getElementById("cart-total-price").textContent =
+          `₦${total.toLocaleString()}`;
+        summary.style.display = "block";
+      }
+
+      function changeQty(idx, delta) {
+        cart[idx].quantity += delta;
+        if (cart[idx].quantity <= 0) cart.splice(idx, 1);
+        updateCartUI();
+        document.getElementById("cart-total").textContent = cart.reduce(
+          (s, i) => s + i.quantity,
+          0,
+        );
+      }
+
+      function removeFromCart(idx) {
+        cart.splice(idx, 1);
+        updateCartUI();
+        document.getElementById("cart-total").textContent = cart.reduce(
+          (s, i) => s + i.quantity,
+          0,
+        );
+      }
+
+      async function placeOrder() {
+        const address = document.getElementById("delivery-address").value;
+        if (!address) {
+          alert("Please enter delivery address");
+          return;
+        }
+        const placedOrders = [];
+        for (const item of cart) {
+          const res = await api("/orders/place", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              produce_id: item.id,
+              quantity: item.quantity,
+              delivery_address: address,
+            }),
+          });
+          const data = await res.json();
+          if (res.ok) placedOrders.push(data.order_id);
+        }
+        cart = [];
+        updateCartUI();
+        document.getElementById("cart-total").textContent = 0;
+        await loadOrders();
+
+        // Auto-trigger payment for first order
+        if (placedOrders.length > 0) {
+          const proceed = confirm(`Order placed! Proceed to payment now?`);
+          if (proceed) await payForOrder(placedOrders[0]);
+        }
+      }
+
+      async function payForOrder(orderId) {
+        const res = await api("/payments/initialize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "order", related_id: orderId }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          // Redirect to Paystack payment page
+          window.location.href = data.authorization_url;
+        } else {
+          alert(data.detail || "Payment initialization failed");
+        }
+      }
+
+      async function confirmDelivery(orderId) {
+        if (!confirm("Confirm you have received this order?")) return;
+        const res = await api(`/orders/${orderId}/confirm-delivery`, {
+          method: "PUT",
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert("Delivery confirmed! Payment released to farmer.");
+          loadOrders();
+        } else {
+          alert(data.detail || "Failed to confirm delivery");
+        }
+      }
+
+      async function loadOrders() {
+        const res = await api("/buyer/orders");
+        const orders = await res.json();
+        document.getElementById("total-orders").textContent = orders.length;
+        const active = orders.filter((o) =>
+          ["pending", "confirmed", "shipped"].includes(o.status),
+        );
+        document.getElementById("active-deliveries").textContent =
+          active.length;
+        const history = document.getElementById("order-history");
+        const tracking = document.getElementById("delivery-tracking");
+        if (!orders.length) {
+          history.innerHTML = '<p style="color:#6b7280">No orders yet.</p>';
+          tracking.innerHTML =
+            '<p style="color:#6b7280">No active deliveries.</p>';
+          return;
+        }
+        history.innerHTML = orders
+          .map(
+            (o) => `
+        <div class="order-card">
+          <div class="order-info">
+            <h4>${o.produce_title}</h4>
+            <p>Qty: ${o.quantity} • ₦${o.total_price.toLocaleString()}</p>
+            <p style="font-size:0.8rem; color:#6b7280">${new Date(o.created_at).toLocaleDateString()}</p>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:0.5rem; align-items:flex-end">
+            <span class="status-badge status-${o.payment_status === "paid" ? "delivered" : "pending"}">${o.payment_status === "paid" ? "✅ Paid" : "⏳ Unpaid"}</span>
+            <span class="status-badge status-${o.status}">${o.status}</span>
+            ${o.payment_status !== "paid" ? `<button class="submit-btn" style="padding:0.3rem 0.75rem; font-size:0.8rem" onclick="payForOrder(${o.id})">💳 Pay Now</button>` : ""}
+            ${o.status === "shipped" && o.payment_status === "paid" ? `<button class="submit-btn" style="padding:0.3rem 0.75rem; font-size:0.8rem; background:#065f46" onclick="confirmDelivery(${o.id})">✅ Confirm Delivery</button>` : ""}
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+        tracking.innerHTML = active.length
+          ? active
+              .map(
+                (o) => `
+        <div class="order-card">
+          <div class="order-info">
+            <h4>${o.produce_title}</h4>
+            <p style="font-size:0.85rem; color:#6b7280">₦${o.total_price.toLocaleString()} • ${o.payment_status === "paid" ? "✅ Paid" : "⏳ Unpaid"}</p>
+            <div class="tracking-steps">
+              ${["pending", "confirmed", "shipped", "delivered"]
+                .map(
+                  (s) => `
+                <div class="tracking-step ${["pending", "confirmed", "shipped", "delivered"].indexOf(o.status) >= ["pending", "confirmed", "shipped", "delivered"].indexOf(s) ? "done" : ""}">
+                  <div class="tracking-dot"></div>
+                  <span>${s}</span>
+                </div>
+              `,
+                )
+                .join("")}
+            </div>
+          </div>
+          ${o.payment_status !== "paid" ? `<button class="submit-btn" style="width:auto; padding:0.4rem 0.75rem; font-size:0.85rem" onclick="payForOrder(${o.id})">💳 Pay Now</button>` : ""}
+        </div>
+      `,
+              )
+              .join("")
+          : '<p style="color:#6b7280">No active deliveries.</p>';
+      }
+
+      function bookColdRoom(name) {
+        const msg = document.getElementById("cold-msg");
+        msg.style.display = "block";
+        msg.className = "msg success";
+        msg.textContent = `Slot requested at ${name}! Our team will contact you shortly.`;
+        document.getElementById("cold-bookings").textContent =
+          parseInt(document.getElementById("cold-bookings").textContent) + 1;
+      }
+
+      // Event delegation for dynamically loaded buttons
+      document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("add-to-cart-btn")) {
+          const card = e.target.closest(".product-card");
+          const title = card.querySelector("h4").textContent;
+          const price = parseInt(
+            card
+              .querySelector(".product-price")
+              .textContent.replace(/[₦,]/g, ""),
+          );
+          const meta = card.querySelector(".product-meta").textContent;
+          const produceId = e.target.dataset.id;
+          addToCart({
+            id: parseInt(produceId),
+            title,
+            price,
+            unit: meta.split("per ")[1] || "unit",
+            location: meta.split("•")[0].replace("📍", "").trim(),
+          });
+        }
+        if (e.target.classList.contains("cold-room-btn")) {
+          alert(
+            "Cold room booking request sent! Our team will contact you shortly.",
+          );
+        }
+      });
+
+      loadProfile();
+      loadProduce();
+      loadOrders();
+    </script>
+  </body>
+</html>
