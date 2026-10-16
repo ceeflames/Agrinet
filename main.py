@@ -9,13 +9,16 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from typing import Optional
 from pydantic import BaseModel
+import psycopg2
+from dotenv import load_dotenv
 import os, shutil, uuid
-
 from database import get_db, init_db, User, UserDocument, Produce, Order, Investment, VetQuestion, Consultation, Withdrawal, Transaction, Notification, ColdRoom, ColdRoomBooking, Equipment, Farmland, EquipmentBooking, FarmlandBooking
 from payments import router as payments_router
 from auth import verify_password, get_password_hash, create_access_token, decode_token, generate_otp, send_otp_sms
 from notifications import (notify_farmer_new_order, notify_buyer_order_shipped, notify_farmer_vet_answer, notify_user_verified, notify_withdrawal_approved, notify_withdrawal_rejected)
 from config import COMMISSION_RATES
+
+load_dotenv()
 
 app = FastAPI(title="AgriNet API", version="3.0")
 app.include_router(payments_router)
@@ -26,6 +29,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     msg = "; ".join([f"{' -> '.join(str(l) for l in e['loc'])}: {e['msg']}" for e in errors])
     return JSONResp(status_code=422, content={"detail": msg})
 
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///agrinet.db")
+conn = psycopg2.connect(DATABASE_URL) if DATABASE_URL.startswith("postgres") else None
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
